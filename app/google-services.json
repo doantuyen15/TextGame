@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "136183341582",
-    "firebase_url": "https://textgame-84a2c.firebaseio.com",
-    "project_id": "textgame-84a2c",
-    "storage_bucket": "textgame-84a2c.appspot.com"
+    "project_number": "113405340204",
+    "firebase_url": "https://textgame-30511.firebaseio.com",
+    "project_id": "textgame-30511",
+    "storage_bucket": "textgame-30511.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:136183341582:android:088b0f2bc4b62efd72525f",
+        "mobilesdk_app_id": "1:113405340204:android:df24e85619114ba50e7f89",
         "android_client_info": {
           "package_name": "com.exercises.textgame"
         }
       },
       "oauth_client": [
         {
-          "client_id": "136183341582-1006a0kr43o7ndts29jblqhf3f30m6tk.apps.googleusercontent.com",
+          "client_id": "113405340204-d5mrb6t9ckrq73ftaeidlbuq5c9ll3na.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDxD5_QRlpbnm3W9L0NK-5QDKuTC5BUHGc"
+          "current_key": "AIzaSyD__kkRFEQRClLmDuNV9VJ1Y6zZHUp0GZE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "136183341582-1006a0kr43o7ndts29jblqhf3f30m6tk.apps.googleusercontent.com",
+              "client_id": "113405340204-d5mrb6t9ckrq73ftaeidlbuq5c9ll3na.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
