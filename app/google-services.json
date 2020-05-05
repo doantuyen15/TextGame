@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "136183341582",
+    "firebase_url": "https://textgame-84a2c.firebaseio.com",
+    "project_id": "textgame-84a2c",
+    "storage_bucket": "textgame-84a2c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136183341582:android:088b0f2bc4b62efd72525f",
+        "android_client_info": {
+          "package_name": "com.exercises.textgame"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136183341582-1006a0kr43o7ndts29jblqhf3f30m6tk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxD5_QRlpbnm3W9L0NK-5QDKuTC5BUHGc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "136183341582-1006a0kr43o7ndts29jblqhf3f30m6tk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
