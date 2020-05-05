@@ -15,7 +15,7 @@
         tools:layout_editor_absoluteY="50dp" />
 
     <TextView
-        android:id="@+id/Tag_Name"
+        android:id="@+id/Tag_Create_Name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -25,7 +25,7 @@
         tools:layout_editor_absoluteY="204dp" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/Create_Name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
