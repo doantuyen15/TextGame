@@ -85,18 +85,19 @@
         android:id="@+id/validate"
         android:layout_width="343dp"
         android:layout_height="48dp"
+        android:layout_marginBottom="6dp"
         android:gravity="center_horizontal|center"
         android:text="validate"
         android:textAppearance="@style/validate"
+        app:layout_constraintBottom_toTopOf="@+id/signupwith"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="456dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/sigup_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="139dp"
+        android:layout_marginBottom="100dp"
         android:gravity="center_horizontal|center"
         android:text="Don't have an account? Sign-up"
         android:textAppearance="@style/don_t_have_"
@@ -105,6 +106,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/signupwith"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/connect_background"
+        android:drawableStart="@drawable/googleicon"
+        android:gravity="center_horizontal|center"
+        android:paddingStart="33dp"
+        android:paddingEnd="44dp"
+        android:text="Signup with Google"
+        android:textAppearance="@style/signup_witgg"
+        app:layout_constraintBottom_toTopOf="@+id/sigup_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
