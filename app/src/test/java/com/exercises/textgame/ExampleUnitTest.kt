@@ -1,4 +1,4 @@
-package com.exercises.myapplication
+package com.exercises.textgame
 
 import org.junit.Test
 
