@@ -1,4 +1,4 @@
-package com.exercises.myapplication
+package com.exercises.textgame
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,7 +6,6 @@ import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_splash.*
 import android.content.Intent
 import android.view.animation.Animation
-import android.widget.Toast
 import android.view.View
 
 
