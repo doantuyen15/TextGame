@@ -83,11 +83,12 @@
 
     <Button
         android:id="@+id/validate"
-        android:layout_width="343dp"
-        android:layout_height="48dp"
+        android:layout_width="311dp"
+        android:layout_height="53dp"
         android:layout_marginBottom="6dp"
         android:gravity="center_horizontal|center"
         android:text="validate"
+        android:background="@drawable/connect_background"
         android:textAppearance="@style/validate"
         app:layout_constraintBottom_toTopOf="@+id/signupwith"
         app:layout_constraintEnd_toEndOf="parent"
