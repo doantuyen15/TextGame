@@ -22,7 +22,7 @@ class SplashActivity : AppCompatActivity() {
             }
 
             override fun onAnimationEnd(animation: Animation?) {
-                logo_splash.setVisibility(View.GONE)
+                logo_splash.visibility = View.INVISIBLE
                 startActivity(Intent(this@SplashActivity,MainActivity::class.java))
                 overridePendingTransition(R.anim.fade_in,R.anim.fade_out)
             }
