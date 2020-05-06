@@ -82,11 +82,11 @@
         android:gravity="center"
         android:text="Password"
         android:textAppearance="@style/password"
-        app:layout_constraintBottom_toTopOf="@+id/Password"
+        app:layout_constraintBottom_toTopOf="@+id/Create_Password"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/Password"
+        android:id="@+id/Create_Password"
         android:layout_width="280dp"
         android:layout_height="35dp"
         android:layout_marginStart="48dp"
@@ -126,6 +126,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/Create_progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/Create_FullName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Create_an_account" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
