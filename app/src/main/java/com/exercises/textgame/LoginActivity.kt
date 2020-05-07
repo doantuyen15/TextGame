@@ -3,19 +3,13 @@ package com.exercises.textgame
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.login.*
-import java.sql.DatabaseMetaData
+
 
 
 class LoginActivity : BaseActivity() {
 
-    var database: DatabaseReference
 
-    init{
-        database = FirebaseDatabase.getInstance().reference
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +17,8 @@ class LoginActivity : BaseActivity() {
         setProgressBar(progressBar)
 
 
-        signupwithgg.setOnClickListener{
+        login_validate.setOnClickListener{
+            showProgressBar()
             performLogin(Email.text.toString(),Password.text.toString())
         }
 
@@ -42,7 +37,6 @@ class LoginActivity : BaseActivity() {
         if (!validateForm(email,password)) {
             return
         }
-        showProgressBar()
         fireBaseAuthInstance.signInWithEmailAndPassword(email,password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -50,15 +44,16 @@ class LoginActivity : BaseActivity() {
                     Toast.makeText(baseContext, "$user", Toast.LENGTH_SHORT).show()
                     //updateUI(user)
                 } else {
-                    Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    val getError = task.getException()?.message
+                    Toast.makeText(this, "$getError", Toast.LENGTH_LONG).show()
                     //updateUI(null)
                 }
                 hideProgressBar()
             }
     }
     private fun validateForm(email : String, password : String): Boolean {
-        var valid = true
 
+        valid = true
         if (TextUtils.isEmpty(email)) {
             Email.error = "Required."
             valid = false
