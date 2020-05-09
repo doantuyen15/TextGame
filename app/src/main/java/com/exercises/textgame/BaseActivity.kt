@@ -61,5 +61,6 @@ open class BaseActivity : AppCompatActivity() {
         private const val TAG = "BASE"
     }
 }
-class UserInfo(val uid : String?=null, val score: Int?=0)
+class UserInfo(val uid : String?=null)
+class RoomInfo(val host: String?=null, val joinedUserId: String?=null)
 

@@ -1,5 +1,6 @@
 package com.exercises.textgame
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
@@ -20,6 +21,10 @@ class LoginActivity : BaseActivity() {
         login_validate.setOnClickListener{
             showProgressBar()
             performLogin(Email.text.toString(),Password.text.toString())
+        }
+        sigup_text.setOnClickListener {
+            startActivity(Intent(this,SignupActivity::class.java))
+            finish()
         }
 
     }

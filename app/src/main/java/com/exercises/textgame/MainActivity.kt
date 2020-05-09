@@ -14,6 +14,11 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
 
         logo.setOnClickListener{
+
+            startActivity(Intent(this,GameActivity::class.java))
+        }
+
+        Sign_out.setOnClickListener{
             auth.signOut()
             startActivity(Intent(this, SignupActivity::class.java))
         }

@@ -47,7 +47,6 @@ class SignupActivity : BaseActivity() {
                             val getError = task.getException()?.message
                             Toast.makeText(this, "$getError", Toast.LENGTH_LONG).show()
                             //delete temp user if error
-                            getRef(fullName).setValue(null)
                             hideProgressBar()
                         }
                     })
@@ -84,7 +83,7 @@ class SignupActivity : BaseActivity() {
    }
     private fun saveUserToFireBase(uid : String, fullName : String) {
         val ref = fireBaseDataBaseInstance.getReference("/users/$fullName")
-        val user = UserInfo(uid?:"")
+        val user = UserInfo(uid)
         ref.setValue(user)
             .addOnSuccessListener {
                 Toast.makeText(this, "Sign Up Successful!", Toast.LENGTH_LONG).show()
