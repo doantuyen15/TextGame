@@ -34,7 +34,7 @@ class SignupActivity : BaseActivity() {
 
         //check if username already exists on server
         val user = UserInfo(null)
-        getRef(fullName).setValue(user)
+        dbgetRefUser(fullName).setValue(user)
 
             //create temp user on server
             .addOnSuccessListener {
@@ -82,10 +82,12 @@ class SignupActivity : BaseActivity() {
         return valid
    }
     private fun saveUserToFireBase(uid : String, fullName : String) {
-        val ref = fireBaseDataBaseInstance.getReference("/users/$fullName")
-        val user = UserInfo(uid)
+        // ref: /users/username
+        val ref = dbgetRefUser(fullName)
+        val user = UserInfo(uid,fullName)
         ref.setValue(user)
             .addOnSuccessListener {
+                currentUser = user
                 Toast.makeText(this, "Sign Up Successful!", Toast.LENGTH_LONG).show()
                 hideProgressBar()
                 finish()

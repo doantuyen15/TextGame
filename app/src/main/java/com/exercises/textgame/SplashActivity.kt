@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_splash.*
 import android.content.Intent
+import android.util.Log
 import android.view.animation.Animation
 import android.view.View
 
@@ -13,17 +14,19 @@ class SplashActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+
         val animSplash = AnimationUtils.loadAnimation(this,R.anim.splash)
 
-//        fetchUsers()
+
         logo_splash.startAnimation(animSplash)
 
 
         animSplash.setAnimationListener(object: Animation.AnimationListener {
             override fun onAnimationEnd(animation: Animation?) {
                 logo_splash.visibility = View.INVISIBLE
-                if (signedUser != null) {
-                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                if (currentUser != null) {
+                    Log.d(SplashActivity::class.java.simpleName,"************************${currentUser!!.username}")
+                    startActivity(Intent(this@SplashActivity, LobbyActivity::class.java))
                 }
                 else {
                     startActivity(Intent(this@SplashActivity, SignupActivity::class.java))
@@ -36,6 +39,7 @@ class SplashActivity : BaseActivity() {
             }
 
             override fun onAnimationStart(animation: Animation?) {
+                fetchUsers()
             }
 
         })
