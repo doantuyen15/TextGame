@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Text Game</string>
+    <string name="player_name">Player Name</string>
 </resources>

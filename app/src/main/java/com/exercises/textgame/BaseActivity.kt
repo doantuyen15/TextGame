@@ -70,6 +70,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 }
 class UserInfo(val uid : String?=null, val username: String?=null) // user holder
+class PlayerInfo(val playerName: String?="Player", val playerHp: Int?=100) // player holder
 data class RoomInfo(val hostName: String?=null, val joinedUserId: String?=null, val roomTitle: String?="${hostName}'s room", val gameType: String) {
     constructor() : this("","","","")
 }

@@ -1,10 +1,8 @@
 package com.exercises.textgame
 
-import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
@@ -18,7 +16,7 @@ class LobbyActivity : BaseActivity() {
     companion object{
         val TAG = "LOBBY ACTIVITY"
     }
-    val adapter = GroupAdapter<ViewHolder>()
+    private val adapter = GroupAdapter<ViewHolder>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +69,7 @@ class LobbyActivity : BaseActivity() {
                 val roomInfo = p0.getValue(RoomInfo::class.java)
                 if (roomInfo != null) {
                     Log.d(TAG,"************************${roomInfo.roomTitle}")
-                    adapter.add(RoomHolder(roomInfo))
+                    adapter.add(LobbyHolder(roomInfo))
                 }
             }
 
@@ -105,7 +103,7 @@ class LobbyActivity : BaseActivity() {
             }
     }
 
-    class RoomHolder(private val roomInfo: RoomInfo): Item<ViewHolder>(){
+    class LobbyHolder(private val roomInfo: RoomInfo): Item<ViewHolder>(){
         override fun getLayout(): Int {
             return R.layout.room_item
         }
