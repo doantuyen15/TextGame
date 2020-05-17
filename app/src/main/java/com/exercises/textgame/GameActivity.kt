@@ -3,14 +3,13 @@ package com.exercises.textgame
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
+import android.view.animation.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_game.*
-import kotlinx.android.synthetic.main.activity_game.view.*
 import kotlinx.android.synthetic.main.player_item.view.*
+
 
 class GameActivity : BaseActivity() {
 
@@ -20,14 +19,11 @@ class GameActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        val animFadeIn = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation)
         addDummyPlayer()
-
-        button.setOnClickListener {
-            llPlayerList.visibility = View.VISIBLE
-            //rvPlayerList.layoutAnimation = animFadeIn
-            rvPlayerList.adapter = adapter
-            //showSlideBar()
+        rvPlayerList.adapter = adapter
+        sliderButton.setOnClickListener{
+            sliderButton.isEnabled = false
+            getSliderBar()
         }
     }
 
@@ -52,24 +48,44 @@ class GameActivity : BaseActivity() {
         adapter.add(RoomHolder(this, PlayerInfo()))
     }
 
-//    private fun showSlideBar(){
-//        val animFadeIn = AnimationUtils.loadAnimation(this,R.anim.left_fade_in)
-//        llPlayerList.startAnimation(animFadeIn)
-//        animFadeIn.setAnimationListener(object: Animation.AnimationListener{
-//            override fun onAnimationRepeat(animation: Animation?) {
-//                //
-//            }
-//
-//            override fun onAnimationEnd(animation: Animation?) {
-//                //
-//            }
-//
-//            override fun onAnimationStart(animation: Animation?) {
-//                llPlayerList.visibility = View.VISIBLE
-//            }
-//
-//        })
-//    }
+    private fun getSliderBar(){
+        val animSwipeLeft = AnimationUtils.loadAnimation(this, R.anim.left_fade_out)
+        val animSwipeRight = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_anim_fade_in)
+        if (rvPlayerList.visibility == View.VISIBLE){
+            //close slide bar
+            rvPlayerList.startAnimation(animSwipeLeft)
+            animSwipeLeft.setAnimationListener(object: Animation.AnimationListener{
+                override fun onAnimationRepeat(animation: Animation?) {
+                    //
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    rvPlayerList.visibility = View.GONE
+                    sliderButton.isEnabled = true
+                }
+
+                override fun onAnimationStart(animation: Animation?) {
+                    sliderButton.animate().rotation(0F).interpolator = DecelerateInterpolator()
+                }
+            })
+        } else {
+            rvPlayerList.visibility = View.VISIBLE
+            rvPlayerList.layoutAnimation = animSwipeRight
+            rvPlayerList.layoutAnimationListener = object : Animation.AnimationListener{
+                override fun onAnimationRepeat(animation: Animation?) {
+                    //
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    sliderButton.isEnabled = true
+                }
+
+                override fun onAnimationStart(animation: Animation?) {
+                    sliderButton.animate().rotation(180F).interpolator = LinearInterpolator()
+                }
+            }
+        }
+    }
 
     class RoomHolder(private val ctx: Context, private val playerInfo: PlayerInfo): Item<ViewHolder>(){
 
@@ -78,8 +94,6 @@ class GameActivity : BaseActivity() {
         }
 
         override fun bind(viewHolder: ViewHolder, position: Int) {
-            val animFadeIn = AnimationUtils.loadAnimation(ctx, R.anim.left_fade_in)
-            viewHolder.itemView.container.startAnimation(animFadeIn)
             viewHolder.itemView.tvPlayerName.text = playerInfo.playerName
             viewHolder.itemView.progressBarPlayer.progress = playerInfo.playerHp!!
         }

@@ -24,12 +24,12 @@ class SplashActivity : BaseActivity() {
         animSplash.setAnimationListener(object: Animation.AnimationListener {
             override fun onAnimationEnd(animation: Animation?) {
                 logo_splash.visibility = View.INVISIBLE
-                if (currentUser != null) {
-                    Log.d(SplashActivity::class.java.simpleName,"************************${currentUser!!.username}")
+                if (currentUser?.username != null) {
+                    Log.d(SplashActivity::class.java.simpleName,"************************$currentUser")
                     startActivity(Intent(this@SplashActivity, LobbyActivity::class.java))
                 }
                 else {
-                    startActivity(Intent(this@SplashActivity, SignupActivity::class.java))
+                    startActivity(Intent(this@SplashActivity, SignUpActivity::class.java))
                 }
                 overridePendingTransition(R.anim.fade_in,R.anim.fade_out)
                 finish()

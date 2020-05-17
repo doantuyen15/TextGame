@@ -1,14 +1,18 @@
 package com.exercises.textgame
 
+
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_lobby.*
 import kotlinx.android.synthetic.main.room_item.view.*
+
 
 
 class LobbyActivity : BaseActivity() {
@@ -47,37 +51,50 @@ class LobbyActivity : BaseActivity() {
         //create room on server ./gamerooms/$username
         btCreateGame.setOnClickListener {
             showProgressBar()
-            creatNewRoom()
+            createNewRoom()
         }
     }
     private fun listenForLobby(){
         val refLobby = fireBaseDataBaseInstance.getReference("gamerooms")
-        refLobby.addChildEventListener(object: ChildEventListener{
+        refLobby.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
-                //
+                Log.d(TAG, "loadPost:onCancelled", p0.toException())
             }
 
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-                //
-            }
-
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                //val roomInfo = p0.getValue(RoomInfo::class.java)
-            }
-
-            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+            override fun onDataChange(p0: DataSnapshot) {
                 val roomInfo = p0.getValue(RoomInfo::class.java)
                 if (roomInfo != null) {
                     Log.d(TAG,"************************${roomInfo.roomTitle}")
                     adapter.add(LobbyHolder(roomInfo))
                 }
             }
-
-            override fun onChildRemoved(p0: DataSnapshot) {
-                //
-            }
-
         })
+/*        refLobby.addChildEventListener(object: ChildEventListener{
+//            override fun onCancelled(p0: DatabaseError) {
+//                //
+//            }
+//
+//            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+//                //
+//            }
+//
+//            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+//                //val roomInfo = p0.getValue(RoomInfo::class.java)
+//            }
+//
+//            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+//                val roomInfo = p0.getValue(RoomInfo::class.java)
+//                if (roomInfo != null) {
+//                    Log.d(TAG,"************************${roomInfo.roomTitle}")
+//                    adapter.add(LobbyHolder(roomInfo))
+//                }
+//            }
+//
+//            override fun onChildRemoved(p0: DataSnapshot) {
+//                //
+//            }
+//
+       })*/
     }
     //private fun displayLobby
     private fun startProfileActivity(movie: RoomInfo){
@@ -87,13 +104,13 @@ class LobbyActivity : BaseActivity() {
         startActivity(intent)
     }
 
-    private fun creatNewRoom(){
+    private fun createNewRoom(){
         btCreateGame.isEnabled = false
         edtRoomTitle.isEnabled = false
-        val roomTilte: String? = edtRoomTitle.text.toString()
-        val roomInfo = RoomInfo(currentUser?.username, currentUser?.uid, roomTilte, "quiz")
+        val roomTitle: String? = edtRoomTitle.text.toString()
+        val roomInfo = RoomInfo(currentUser?.username, UserInfo(), roomTitle, "quiz")
         //Log.d(GameActivity::class.java.simpleName,"************************$roomInfo")
-        dbgetRefRoom(currentUser?.username)
+        dbGetRefRoom(currentUser?.username)
             .setValue(roomInfo)
             .addOnCompleteListener {
                 btCreateGame.isEnabled = true

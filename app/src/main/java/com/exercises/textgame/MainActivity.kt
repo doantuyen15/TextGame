@@ -18,7 +18,7 @@ class MainActivity : BaseActivity() {
 
         Sign_out.setOnClickListener{
             auth.signOut()
-            startActivity(Intent(this, SignupActivity::class.java))
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
 
 

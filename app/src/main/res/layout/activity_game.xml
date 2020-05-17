@@ -8,20 +8,36 @@
 
     <LinearLayout
         android:id="@+id/llPlayerList"
-        android:layout_width="160dp"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@id/button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvPlayerList"
-            android:layout_width="match_parent"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:layoutAnimation="@anim/layout_anim_fade_in"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:visibility="visible" />
+
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/sliderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@color/trans"
+        android:rotation="180"
+        android:tint="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llPlayerList"
+        app:srcCompat="@drawable/slider_button" />
 
     <Button
         android:id="@+id/button"

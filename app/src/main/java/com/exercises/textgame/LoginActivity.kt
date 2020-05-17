@@ -23,7 +23,7 @@ class LoginActivity : BaseActivity() {
             performLogin(Email.text.toString(),Password.text.toString())
         }
         sigup_text.setOnClickListener {
-            startActivity(Intent(this,SignupActivity::class.java))
+            startActivity(Intent(this,SignUpActivity::class.java))
             finish()
         }
 
@@ -40,16 +40,18 @@ class LoginActivity : BaseActivity() {
 
     private  fun performLogin(email: String, password: String){
         if (!validateForm(email,password)) {
+            hideProgressBar()
             return
         }
         fireBaseAuthInstance.signInWithEmailAndPassword(email,password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    fetchUsers()
                     val user = auth.currentUser
                     Toast.makeText(baseContext, "$user", Toast.LENGTH_SHORT).show()
                     //updateUI(user)
                 } else {
-                    val getError = task.getException()?.message
+                    val getError = task.exception?.message
                     Toast.makeText(this, "$getError", Toast.LENGTH_LONG).show()
                     //updateUI(null)
                 }
