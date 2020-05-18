@@ -1,134 +1,107 @@
 package com.exercises.textgame
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.Item
-import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_lobby.*
-import kotlinx.android.synthetic.main.room_item.view.*
-
 
 
 class LobbyActivity : BaseActivity() {
 
     companion object{
-        val TAG = "LOBBY ACTIVITY"
+        const val TAG = "LOBBY ACTIVITY"
     }
-    private val adapter = GroupAdapter<ViewHolder>()
+    private lateinit var adapter : LobbyAdapter
+    val roomList: ArrayList<RoomInfo> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lobby)
         setProgressBar(progressBar)
 
-
         listenForLobby()
+        adapter = LobbyAdapter(this, roomList, listener)
         rvGameRoomList.adapter = adapter
-/*get current room list on server
-        fireBaseDataBaseInstance.getReference("gamerooms")
-            .addListenerForSingleValueEvent(object : ValueEventListener{
-                override fun onCancelled(p0: DatabaseError) {
-                    //
-                }
 
-                override fun onDataChange(p0: DataSnapshot) {
-                    p0.children.forEach {
-                        val roomInfo = it.getValue(RoomInfo::class.java)
-                        if (roomInfo != null) {
-                            validateLayoutAdapter(roomInfo)
-                        }
-                    }
-                }
-            })
-
-*/
-        //create room on server ./gamerooms/$username
+        //create room on server ./gamerooms/$roomId
         btCreateGame.setOnClickListener {
-            showProgressBar()
             createNewRoom()
         }
     }
     private fun listenForLobby(){
-        val refLobby = fireBaseDataBaseInstance.getReference("gamerooms")
-        refLobby.addValueEventListener(object : ValueEventListener {
+        roomRef.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {
-                Log.d(TAG, "loadPost:onCancelled", p0.toException())
+                //
             }
 
-            override fun onDataChange(p0: DataSnapshot) {
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+                //
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+                val changedData = p0.getValue(RoomInfo::class.java)
+                val index = roomList.indexOf(changedData)
+                roomList[index] = changedData!!
+                adapter.notifyItemChanged(index)
+            }
+
+            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val roomInfo = p0.getValue(RoomInfo::class.java)
                 if (roomInfo != null) {
-                    Log.d(TAG,"************************${roomInfo.roomTitle}")
-                    adapter.add(LobbyHolder(roomInfo))
+                    roomList.add(roomInfo)
+                    adapter.notifyItemInserted(roomList.indexOf(roomInfo))
+                    rvGameRoomList.scrollToPosition(adapter.itemCount - 1)
                 }
             }
-        })
-/*        refLobby.addChildEventListener(object: ChildEventListener{
-//            override fun onCancelled(p0: DatabaseError) {
-//                //
-//            }
-//
-//            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-//                //
-//            }
-//
-//            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-//                //val roomInfo = p0.getValue(RoomInfo::class.java)
-//            }
-//
-//            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-//                val roomInfo = p0.getValue(RoomInfo::class.java)
-//                if (roomInfo != null) {
-//                    Log.d(TAG,"************************${roomInfo.roomTitle}")
-//                    adapter.add(LobbyHolder(roomInfo))
-//                }
-//            }
-//
-//            override fun onChildRemoved(p0: DataSnapshot) {
-//                //
-//            }
-//
-       })*/
-    }
-    //private fun displayLobby
-    private fun startProfileActivity(movie: RoomInfo){
-        //val intent = Intent(this, ProfileActivity::class.java)
-        //intent.putExtra(MOVIE_TITLE_KEY, movie.title)
 
-        startActivity(intent)
+            override fun onChildRemoved(p0: DataSnapshot) {
+                val index = roomList.indexOf(p0.getValue(RoomInfo::class.java))
+                //adapter.removeGroup(index)
+                adapter.notifyItemRemoved(index)
+            }
+
+       })
     }
 
     private fun createNewRoom(){
+        showProgressBar()
+        val data = intent.extras
+        val userName = data?.getString("USER_USERNAME_KEY")
         btCreateGame.isEnabled = false
-        edtRoomTitle.isEnabled = false
-        val roomTitle: String? = edtRoomTitle.text.toString()
-        val roomInfo = RoomInfo(currentUser?.username, UserInfo(), roomTitle, "quiz")
-        //Log.d(GameActivity::class.java.simpleName,"************************$roomInfo")
-        dbGetRefRoom(currentUser?.username)
+        val roomTitle = if (edtRoomTitle.text.toString() == ""){
+            "$userName's room"
+        } else {
+            edtRoomTitle.text.toString()
+        }
+        Log.d(LobbyActivity::class.java.simpleName,"************************$roomTitle")
+        val roomInfo = RoomInfo(userName, roomTitle, QUIZ_GAME_KEY)
+        //        Log.d(LobbyActivity::class.java.simpleName,"************************$userName")
+        roomRef.push()
             .setValue(roomInfo)
             .addOnCompleteListener {
                 btCreateGame.isEnabled = true
-                edtRoomTitle.isEnabled = true
-                Toast.makeText(this,"Room created!", Toast.LENGTH_LONG).show()
+                edtRoomTitle.text.clear()
+                startGameActivity(roomInfo)
                 goneProgressBar()
             }
     }
-
-    class LobbyHolder(private val roomInfo: RoomInfo): Item<ViewHolder>(){
-        override fun getLayout(): Int {
-            return R.layout.room_item
+    private val listener = object : LobbyAdapter.OnClickListener {
+        override fun onClick(room: RoomInfo) {
+//            Toast.makeText(this@LobbyActivity,"go go go gogoooooo",Toast.LENGTH_LONG).show()
+            startGameActivity(room)
         }
-
-        override fun bind(viewHolder: ViewHolder, position: Int) {
-            viewHolder.itemView.tvRoomTitle.text = roomInfo.roomTitle
-            viewHolder.itemView.tvRoomType.text = roomInfo.gameType
-        }
-
     }
+
+    private fun startGameActivity(room: RoomInfo){
+        val intent = Intent(this, GameActivity::class.java)
+        intent.putExtra(ROOM_INFO_KEY, room.roomTitle)
+        startActivity(intent)
+    }
+
 }
+

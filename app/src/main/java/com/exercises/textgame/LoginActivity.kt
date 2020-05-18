@@ -7,7 +7,6 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.login.*
 
 
-
 class LoginActivity : BaseActivity() {
 
 
@@ -47,19 +46,15 @@ class LoginActivity : BaseActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     fetchUsers()
-                    val user = auth.currentUser
-                    Toast.makeText(baseContext, "$user", Toast.LENGTH_SHORT).show()
-                    //updateUI(user)
+                    startActivity(Intent(this,MainActivity::class.java))
                 } else {
                     val getError = task.exception?.message
                     Toast.makeText(this, "$getError", Toast.LENGTH_LONG).show()
-                    //updateUI(null)
                 }
                 hideProgressBar()
             }
     }
     private fun validateForm(email : String, password : String): Boolean {
-
         valid = true
         if (TextUtils.isEmpty(email)) {
             Email.error = "Required."
