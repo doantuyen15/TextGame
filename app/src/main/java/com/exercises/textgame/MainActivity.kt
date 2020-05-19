@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
 
+    //fetch current user
     private val currentUser = Firebase.auth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -41,7 +41,7 @@ class SignUpActivity : BaseActivity() {
             return
         }
         //check if username already exists on server
-        userRef.orderByChild("username").equalTo(fullName).addListenerForSingleValueEvent(object : ValueEventListener{
+        userRef.orderByChild(CHILD_USERNAME_KEY).equalTo(fullName).addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
                 hideProgressBar()
                 Toast.makeText(this@SignUpActivity, "${p0.toException()}", Toast.LENGTH_LONG).show()
@@ -106,8 +106,8 @@ class SignUpActivity : BaseActivity() {
                 //ref: /users/usernames/username
                 //dbGetRefUser("usernames").child("$fullName").setValue(true)
                 Toast.makeText(this, "Sign Up Successful!", Toast.LENGTH_LONG).show()
-//                startActivity(Intent(this,LobbyActivity::class.java))
-//                finish()
+                startActivity(Intent(this,MainActivity::class.java))
+                finish()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "${it.message}", Toast.LENGTH_LONG).show()

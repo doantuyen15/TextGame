@@ -27,10 +27,9 @@ open class BaseActivity : AppCompatActivity() {
         return userRef.child(ref)
     }
 
-//    //create room named by user's name
-//    fun dbGetRefRoom(ref: String): DatabaseReference{
-//        return roomRef.child(ref)
-//    }
+    fun dbGetRefRoom(ref: String): DatabaseReference{
+        return roomRef.child(ref)
+    }
 
     fun setProgressBar(bar: ProgressBar) {
         progressBar = bar
@@ -100,7 +99,6 @@ open class BaseActivity : AppCompatActivity() {
     }
 }
 class UserName(val username: String?, val isExist: Boolean? = true)
-data class PlayerInfo(val playerName: String?="Player", val playerHp: Int?=100) // player holder
 data class UserInfo(var username: String? =null, var uid : String? =null) // user holder
 data class RoomInfo(val hostName: String?=null, val roomTitle: String?=null, val gameType: String, val joinedUser: Any?=null) {
     constructor() : this("","","",null)
@@ -109,3 +107,4 @@ const val USER_UID_KEY = "USER_UID_KEY"
 const val USER_USERNAME_KEY = "USER_USERNAME_KEY"
 const val ROOM_INFO_KEY = "ROOM_INFO_KEY"
 const val QUIZ_GAME_KEY = "Quiz"
+const val CHILD_USERNAME_KEY = "username"

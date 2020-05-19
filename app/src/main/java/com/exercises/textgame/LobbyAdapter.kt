@@ -24,12 +24,12 @@ class LobbyAdapter(private val context: Context, var data: ArrayList<RoomInfo>, 
         holder.title.text = room.roomTitle
         holder.type.text = room.gameType
         holder.itemView.setOnClickListener {
-            listener.onClick(room)
+            listener.onClick(position)
         }
     }
 
     interface OnClickListener {
-        fun onClick(room: RoomInfo)
+        fun onClick(index: Int)
     }
 
     class LobbyVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
