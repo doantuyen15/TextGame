@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
@@ -16,7 +15,7 @@ open class BaseActivity : AppCompatActivity() {
     private var auth = Firebase.auth
     private var currentUser = auth.currentUser
     var fireBaseAuthInstance = FirebaseAuth.getInstance()
-    var fireBaseDataBaseInstance = FirebaseDatabase.getInstance()
+    private var fireBaseDataBaseInstance = FirebaseDatabase.getInstance()
     val userRef = fireBaseDataBaseInstance.getReference("/users")
     val roomRef = fireBaseDataBaseInstance.getReference("/gamerooms")
     var valid : Boolean = true

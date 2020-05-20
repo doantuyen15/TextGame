@@ -19,8 +19,8 @@ class LobbyActivity : BaseActivity() {
     private lateinit var adapter : LobbyAdapter
     val roomList: ArrayList<RoomInfo> = ArrayList()
     val roomKeyList = mutableListOf<String>()
-    var uid = ""
-    var userName = ""
+    private var uid = ""
+    private var userName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +63,10 @@ class LobbyActivity : BaseActivity() {
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                if(p0.key != CHILD_USERSTATUS_KEY && p0.key != CHILD_ATTACKER_KEY){
+                if(p0.key == CHILD_HOSTNAME_KEY || p0.key == CHILD_TITLE_KEY){
                     updateLobby(p0)
                 }
-                Log.d(LobbyActivity::class.java.simpleName,"Lobbychanged****************${p0.key}")
+//                Log.d(LobbyActivity::class.java.simpleName,"Lobbychanged****************${p0.key}")
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
@@ -129,6 +129,7 @@ class LobbyActivity : BaseActivity() {
         val intent = Intent(this, GameActivity::class.java)
         roomKey?.let {
             intent.putExtra(ROOM_INFO_KEY, it)
+            intent.putExtra(USER_UID_KEY, uid)
             val defaultUserStatus = HashMap<String, Any?>()
             defaultUserStatus[uid] = PlayerStatus(userName)
             val user = HashMap<String, String>()
