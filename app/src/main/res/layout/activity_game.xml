@@ -6,6 +6,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/cv_quiz"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="80dp"-->
+<!--        android:layout_marginStart="8dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginEnd="8dp"-->
+<!--        android:layout_marginBottom="8dp"-->
+<!--        android:visibility="visible"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/rvChatLog"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="@id/rvChatLog"-->
+<!--        app:layout_constraintTop_toTopOf="parent">-->
+
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent">-->
+
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--    </androidx.cardview.widget.CardView>-->
+    <include
+        android:id="@+id/cv_quiz"
+        layout="@layout/quiz_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/rvChatLog"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvChatLog"
         android:layout_width="0dp"
@@ -15,8 +45,10 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/btnSendMessage"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/llPlayerList"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/cv_quiz"
+        app:layout_constraintVertical_bias="0.0" />
 
     <LinearLayout
         android:id="@+id/llPlayerList"
@@ -35,9 +67,9 @@
             android:layoutAnimation="@anim/layout_anim_fade_in"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:visibility="visible"
             app:reverseLayout="true"
-            app:stackFromEnd="true" />
+            app:stackFromEnd="true"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
@@ -70,12 +102,35 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="4dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnSendMessage"
+        app:layout_constraintEnd_toStartOf="@+id/btnMic"
         app:layout_constraintStart_toEndOf="@id/sliderButton"
         app:layout_constraintTop_toBottomOf="@id/rvChatLog" />
+
+    <ImageButton
+        android:id="@+id/btnMic"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="4dp"
+        android:background="@color/trans"
+        android:tint="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="@id/btnSendMessage"
+        app:layout_constraintEnd_toStartOf="@id/btnSendMessage"
+        app:layout_constraintTop_toTopOf="@id/btnSendMessage"
+        app:srcCompat="@drawable/ic_mic" />
+
+    <Button
+        android:id="@+id/btnStartGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Game"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rvChatLog"
+        app:layout_constraintEnd_toEndOf="@id/rvChatLog"
+        app:layout_constraintStart_toStartOf="@id/rvChatLog"
+        app:layout_constraintTop_toTopOf="@id/rvChatLog" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

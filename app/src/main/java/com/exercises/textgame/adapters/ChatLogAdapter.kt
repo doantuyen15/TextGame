@@ -26,10 +26,11 @@ class ChatLogAdapter(private val context: Context, var data: LinkedHashMap<Strin
         val message = data.entries.elementAt(position).value
 
 //        val message = HashMap(messageEntity)
-        Log.d(ChatLogAdapter::class.java.simpleName, "Changed*****************************${message}")
-
-        holder.tvMessage.text = message?.message
-        holder.tvDisplayName.text = message?.displayName
+//        Log.d(ChatLogAdapter::class.java.simpleName, "Changed*****************************${message}")
+        if (!message?.message.isNullOrBlank()){
+            holder.tvMessage.text = message?.message
+            holder.tvDisplayName.text = message?.displayName
+        }
 //        holder.itemView.setOnClickListener {
 //            listener.onClick(position)
 //        }

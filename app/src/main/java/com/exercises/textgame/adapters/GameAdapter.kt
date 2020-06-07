@@ -25,7 +25,7 @@ class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus
     override fun onBindViewHolder(holder: RoomVH, position: Int) {
         val player = data[position]
         holder.tvPlayer.text = player?.playerName
-        holder.processBar.progress = player?.playerHp ?: 0
+        holder.processBar.progress = (player?.playerHp ?: 0L).toInt()
 //        holder.itemView.setOnClickListener {
 //            listener.onClick(position)
 //        }

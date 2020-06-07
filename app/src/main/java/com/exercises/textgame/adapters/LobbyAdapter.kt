@@ -1,11 +1,14 @@
-package com.exercises.textgame
+package com.exercises.textgame.adapters
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.exercises.textgame.R
+import com.exercises.textgame.models.RoomInfo
 
 
 class LobbyAdapter(private val context: Context, var data: ArrayList<RoomInfo>, private val listener: OnClickListener) : RecyclerView.Adapter<LobbyAdapter.LobbyVH>() {
@@ -21,6 +24,9 @@ class LobbyAdapter(private val context: Context, var data: ArrayList<RoomInfo>, 
 
     override fun onBindViewHolder(holder: LobbyVH, position: Int) {
         val room = data[position]
+        if(room.roomStatus == "playing"){
+            holder.title.setTextColor(Color.parseColor("#37EE00A7"))
+        }
         holder.title.text = room.roomTitle
         holder.type.text = room.gameType
         holder.itemView.setOnClickListener {

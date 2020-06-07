@@ -1,16 +1,23 @@
 package com.exercises.textgame
 
-import android.os.Bundle
-import android.util.Log
+import android.annotation.SuppressLint
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.*
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
+@SuppressLint("Registered")
 open class BaseActivity : AppCompatActivity() {
+
+//    init {
+//        FirebaseApp.initializeApp(this)
+//    }
 
     private var auth = Firebase.auth
     private var currentUser = auth.currentUser
@@ -18,6 +25,9 @@ open class BaseActivity : AppCompatActivity() {
     private var fireBaseDataBaseInstance = FirebaseDatabase.getInstance()
     val userRef = fireBaseDataBaseInstance.getReference("/users")
     val roomRef = fireBaseDataBaseInstance.getReference("/gamerooms")
+    val commandRef = fireBaseDataBaseInstance.getReference("/command")
+    val connectedRef = fireBaseDataBaseInstance.getReference(".info/connected")
+    val dbQuiz = FirebaseFirestore.getInstance()
     var valid : Boolean = true
 
     private var progressBar: ProgressBar? = null
@@ -28,6 +38,10 @@ open class BaseActivity : AppCompatActivity() {
 
     fun dbGetRefRoom(ref: String): DatabaseReference{
         return roomRef.child(ref)
+    }
+
+    fun getDbQuiz(ref: String): CollectionReference {
+        return dbQuiz.collection(ref)
     }
 
     fun setProgressBar(bar: ProgressBar) {
@@ -97,13 +111,15 @@ open class BaseActivity : AppCompatActivity() {
         private const val TAG = "BASE"
     }
 }
-class UserName(val username: String?, val isExist: Boolean? = true)
+//class UserName(val username: String?, val isExist: Boolean? = true)
 data class UserInfo(var username: String? =null, var uid : String? =null) // user holder
-data class RoomInfo(val hostName: String?=null, val roomTitle: String?=null, val gameType: String, val joinedUser: Any?=null) {
-    constructor() : this("","","",null)
-}
+//data class RoomInfo(val hostName: String?=null, val roomTitle: String?=null, val gameType: String, val joinedUser: Any?=null) {
+//    constructor() : this("","","",null)
+//}
 const val USER_UID_KEY = "USER_UID_KEY"
 const val USER_USERNAME_KEY = "USER_USERNAME_KEY"
 const val ROOM_INFO_KEY = "ROOM_INFO_KEY"
 const val QUIZ_GAME_KEY = "Quiz"
 const val CHILD_USERNAME_KEY = "username"
+const val LANGUAGE_EN_KEY = "en_US"
+const val REQUEST_SPEECH_CODE = 3000

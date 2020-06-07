@@ -28,15 +28,6 @@ class LoginActivity : BaseActivity() {
 
     }
 
-//    private fun showProgressBar() {
-//        progressBar?.visibility = View.VISIBLE
-//    }
-//
-//    private fun hideProgressBar() {
-//        progressBar?.visibility = View.INVISIBLE
-//    }
-
-
     private  fun performLogin(email: String, password: String){
         if (!validateForm(email,password)) {
             hideProgressBar()
@@ -54,6 +45,7 @@ class LoginActivity : BaseActivity() {
                 hideProgressBar()
             }
     }
+
     private fun validateForm(email : String, password : String): Boolean {
         valid = true
         if (TextUtils.isEmpty(email)) {

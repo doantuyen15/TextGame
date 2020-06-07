@@ -3,7 +3,7 @@ package com.exercises.textgame
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import com.exercises.textgame.adapters.LobbyAdapter
 import com.exercises.textgame.models.*
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -30,9 +30,13 @@ class LobbyActivity : BaseActivity() {
         getCurrentUser()
         listenForLobby()
 
-        adapter = LobbyAdapter(this, roomList, listener)
-        rvGameRoomList.adapter = adapter
+        adapter = LobbyAdapter(
+            this,
+            roomList,
+            listener
+        )
 
+        rvGameRoomList.adapter = adapter
         edtRoomTitle.hint = userName
 
         //create room on server ./gamerooms/$roomId
@@ -40,6 +44,7 @@ class LobbyActivity : BaseActivity() {
             createNewRoom()
         }
     }
+
 
     private fun getCurrentUser(){
         val bundle = intent.extras
@@ -84,10 +89,10 @@ class LobbyActivity : BaseActivity() {
     }
 
     private fun updateLobby(p0: DataSnapshot) {
-        val changedData = p0.getValue(RoomInfo::class.java)
+        val roomInfo = p0.getValue(RoomInfo::class.java)
         val index = roomKeyList.indexOf(p0.key)
-        if (changedData != null) {
-            roomList[index] = changedData
+        if (roomInfo != null) {
+            roomList[index] = roomInfo
             adapter.notifyItemChanged(index)
         }
     }
@@ -104,7 +109,7 @@ class LobbyActivity : BaseActivity() {
 
     private fun createNewRoom(){
         showProgressBar()
-        btCreateGame.isEnabled = false
+//        btCreateGame.isEnabled = false
 
         val hostName = userName
         val roomTitle = if (edtRoomTitle.text.toString() == ""){
@@ -120,8 +125,9 @@ class LobbyActivity : BaseActivity() {
     }
     private val listener = object : LobbyAdapter.OnClickListener {
         override fun onClick(index: Int) {
-//            Toast.makeText(this@LobbyActivity,"go go go gogoooooo",Toast.LENGTH_LONG).show()
-            startGameActivity(roomKeyList[index])
+            if(roomList[index].roomStatus != "playing") {
+                startGameActivity(roomKeyList[index])
+            }
         }
     }
 
@@ -130,6 +136,7 @@ class LobbyActivity : BaseActivity() {
         roomKey?.let {
             intent.putExtra(ROOM_INFO_KEY, it)
             intent.putExtra(USER_UID_KEY, uid)
+            intent.putExtra(CHILD_HOSTNAME_KEY, hostName)
             val defaultUserStatus = HashMap<String, Any?>()
             defaultUserStatus[uid] = PlayerStatus(userName)
             val user = HashMap<String, String>()
@@ -141,6 +148,8 @@ class LobbyActivity : BaseActivity() {
                     .setValue(createRoomInfo)
                     .addOnSuccessListener {
                         startActivity(intent)
+                        finish()
+
                     }
             } else {
                 val userJoinToRoom = HashMap<String, Any?>()
@@ -153,14 +162,10 @@ class LobbyActivity : BaseActivity() {
                     .updateChildren(defaultUserStatus)
                     .addOnSuccessListener {
                         startActivity(intent)
+                        finish()
                     }
             }
         }
-
-
-
-//        Log.d(LobbyActivity::class.java.simpleName, "****************$roomKey")
     }
-
 }
 
