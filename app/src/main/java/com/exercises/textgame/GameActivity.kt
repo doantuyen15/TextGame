@@ -1,9 +1,6 @@
 package com.exercises.textgame
 
 import android.app.Activity
-import android.app.AlertDialog
-import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -20,13 +17,10 @@ import com.exercises.textgame.adapters.GameAdapter
 import com.exercises.textgame.models.*
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_game.*
-import kotlinx.android.synthetic.main.layout_loading_dialog.*
 import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
-import kotlin.system.exitProcess
 
 class GameActivity : BaseActivity() {
 
@@ -35,7 +29,7 @@ class GameActivity : BaseActivity() {
     private val playerListStatus = ArrayList<PlayerStatus?>()
     private var playerIndex = ArrayList<String?>()
     private var playerList = HashMap<String,String>()
-    private val chatLogs = LinkedHashMap<String, Message?>()
+    private val chatLogs = ArrayList<Message>()
     private val keyLogs = ArrayList<String?>()
     private var uid: String? = ""
     private var joinedRoomKey: String? = ""
@@ -49,11 +43,14 @@ class GameActivity : BaseActivity() {
         val data = intent.extras
         joinedRoomKey = data?.getString(ROOM_INFO_KEY)
         uid = data?.getString(USER_UID_KEY)
+
         if(data?.getString(CHILD_HOSTNAME_KEY) != null){
             btnStartGame.visibility = View.VISIBLE
         }
+
         fetchCurrentRoomInfo()
-        getConnectionState()
+//        getConnectionState(this)
+
         adapter = GameAdapter(this, playerListStatus)
         adapterChatLog = ChatLogAdapter(this, chatLogs)
         rvPlayerList.adapter = adapter
@@ -77,38 +74,50 @@ class GameActivity : BaseActivity() {
         }
         //Start Game
         btnStartGame.setOnClickListener {
+            btnStartGame.visibility = View.GONE
             sendCommand("start")
         }
     }
 
-    private fun getConnectionState() {
-//        val connectionRef = roomRef.child(joinedRoomKey!!).child("connections")
-        val dialog = AlertDialog.Builder(this@GameActivity)
-            .setCancelable(false)
-            .setView(R.layout.layout_loading_dialog)
-            .setNegativeButton("Cancel", DialogInterface.OnClickListener{_,_ ->
-                finish()
-            })
-            .create()
-        connectedRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val connected = snapshot.getValue(Boolean::class.java) ?: false
-                if (!connected) {
-                    dialog.show()
-                    Log.d("getConnectionState", "disconnected to server")
-                } else{
-                    Log.d("getConnectionState", "connected to server")
-                    if(dialog != null && dialog.isShowing){
-                        dialog.dismiss()
-                    }
-                }
-            }
+//    object FromGameCallBack : CallBack {
+//        override fun onNegativeButtonClick() {
+//            exitProcess(-1)
+//        }
+//    }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("getConnectionState", "Listener was cancelled with error: $error")
-            }
-        })
+    override fun onBackPressed() {
+        super.onBackPressed()
+        Log.d("BackButton", "pressed")
+        finish()
     }
+
+//    private fun getConnectionState() {
+//        val dialog = AlertDialog.Builder(this@GameActivity)
+//            .setCancelable(false)
+//            .setView(R.layout.layout_loading_dialog)
+//            .setNegativeButton("Cancel") { _, _ ->
+//                finish()
+//            }
+//            .create()
+//        connectedRef.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                val connected = snapshot.getValue(Boolean::class.java) ?: false
+//                if (!connected) {
+//                    dialog.show()
+//                    Log.d("getConnectionState", "disconnected to server")
+//                } else{
+//                    Log.d("getConnectionState", "connected to server")
+//                    if(dialog != null && dialog.isShowing){
+//                        dialog.dismiss()
+//                    }
+//                }
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                Log.d("getConnectionState", "Listener was cancelled with error: $error")
+//            }
+//        })
+//    }
 
     private fun getSpeech(languageKey: String) {
         val mIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -164,8 +173,9 @@ class GameActivity : BaseActivity() {
             } catch (e : Exception){
                 Log.e(GameActivity::class.java.simpleName, "Changed*****************************${e.message}")
             }
-            chatLog[keyLog] = Message(playerList[uid].toString(), message)
-            chatLogs.putAll(chatLog)
+            val mes = Message(playerList[uid].toString(), message)
+            chatLog[keyLog] = mes
+            chatLogs.add(mes)
             edtMessage.text.clear()
             dbGetRefRoom(it)
                 .child(CHILD_MESSAGE_KEY)
@@ -180,11 +190,11 @@ class GameActivity : BaseActivity() {
     private fun sendCommand(cmd: String) {
         val command = HashMap<String, Any>()
         when (cmd){
-            "attack" -> {
-                command["attack$joinedRoomKey"] = resultTime
+            COMMAND_ATTACK_KEY -> {
+                command["attack$joinedRoomKey"] = mapOf(uid to resultTime)
                 commandRef.updateChildren(command)
             }
-            "start" -> {
+            COMMAND_START_KEY -> {
                 command["start$joinedRoomKey"] = playerIndex.zip(playerListStatus).toMap()
                 roomRef.child(joinedRoomKey!!).child(CHILD_ROOMSTATUS_KEY).setValue("playing")
                 commandRef.updateChildren(command)
@@ -237,6 +247,14 @@ class GameActivity : BaseActivity() {
                     if(p0.key == CHILD_MESSAGE_KEY){
                         updateLastMessage(p0.children.last())
                     }
+                    if(p0.key == CHILD_ATTACKER_KEY){
+                        if(p0.value.toString() == uid){
+                            attackOtherUser()
+                        }
+                    }
+                    if(p0.key == CHILD_DEFENDER_KEY){
+//                        updateUserStatus(p0.child(CHILD_JOINEDUSER_KEY))
+                    }
 //                    Log.d(GameActivity::class.java.simpleName, "Added*****************************${p0.key}")
                 }
 
@@ -247,6 +265,10 @@ class GameActivity : BaseActivity() {
             })
         }
 //        adapter.add(RoomHolder(playerList))
+    }
+
+    private fun attackOtherUser() {
+//        TODO("Not yet implemented")
     }
 
     private fun getQuiz(round: Round) {
@@ -282,15 +304,14 @@ class GameActivity : BaseActivity() {
         content.text = quiz.content
         val timer = object : CountDownTimer(timeOut, 100) {
             override fun onFinish() {
-                //
+                counter.progress = 0
             }
 
             override fun onTick(p0: Long) {
                 resultTime = timeOut - p0
                 counter.progress = p0.toInt()
-                Log.d("show quiz", "${counter.progress}")
+//                Log.d("show quiz", "${counter.progress}")
             }
-
         }
         timer.start()
     }
@@ -299,7 +320,8 @@ class GameActivity : BaseActivity() {
         val newKey = newMessage.key
         if (!keyLogs.contains(newKey)) {
             keyLogs.add(newKey)
-            chatLogs[newKey.toString()] = newMessage.getValue(Message::class.java)
+            val message = newMessage.getValue(Message::class.java)
+            message?.let { chatLogs.add(it) }
             adapterChatLog.notifyItemInserted(keyLogs.indexOf(newKey))
             rvChatLog.scrollToPosition(adapterChatLog.itemCount - 1)
         }

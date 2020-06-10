@@ -14,6 +14,7 @@ data class RoomInfo(val hostName: String?=null,
 const val CHILD_USERSTATUS_KEY = "userStatus"
 const val CHILD_JOINEDUSER_KEY = "joinedUser"
 const val CHILD_ATTACKER_KEY = "attacker"
+const val CHILD_DEFENDER_KEY = "defender"
 const val CHILD_MESSAGE_KEY = "message"
 const val CHILD_PLAYERHP_KEY = "playerHp"
 const val CHILD_HOSTNAME_KEY = "hostName"

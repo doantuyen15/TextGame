@@ -75,7 +75,9 @@ class LobbyActivity : BaseActivity() {
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                addNewRoom(p0)
+                if(p0.key != PREVENT_REMOVE_KEY) {
+                    addNewRoom(p0)
+                }
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {
@@ -147,9 +149,9 @@ class LobbyActivity : BaseActivity() {
                 dbGetRefRoom(it)
                     .setValue(createRoomInfo)
                     .addOnSuccessListener {
+                        userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(roomKey)
                         startActivity(intent)
                         finish()
-
                     }
             } else {
                 val userJoinToRoom = HashMap<String, Any?>()
@@ -161,11 +163,13 @@ class LobbyActivity : BaseActivity() {
                     .child(CHILD_USERSTATUS_KEY)
                     .updateChildren(defaultUserStatus)
                     .addOnSuccessListener {
+                        userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(roomKey)
                         startActivity(intent)
                         finish()
                     }
             }
         }
     }
+
 }
 
