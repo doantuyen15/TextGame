@@ -3,14 +3,14 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">#60E6CD</item>
+        <item name="colorPrimaryDark">#60E6CD</item>
+        <item name="colorAccent">#60E6CD</item>
     </style>
     <style name="FullScreenDialogStyle" parent="Theme.MaterialComponents.Dialog">
         <item name="android:windowNoTitle">true</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">#60E6CD</item>
+        <item name="colorPrimary">#60E6CD</item>
 
         <!-- Set this to true if you want Full Screen without status bar -->
         <item name="android:windowFullscreen">true</item>
@@ -20,37 +20,90 @@
         <!-- This is important! Don't forget to set window background -->
         <item name="android:windowBackground">@color/white</item>
     </style>
-    <style name="login">
-        <item name="android:textSize">
-            24sp
-        </item>
+    <style name="hello">
+
         <item name="android:textColor">
-            #FFFFFF
+            #17B7BD
         </item>
+
+        <item name="android:textSize">
+            28sp
+        </item>
+
+        <item name="android:letterSpacing">
+            -0.02
+        </item>
+
+    </style>
+    <style name="forgot_pass">
+
+        <item name="android:textSize">
+            14sp
+        </item>
+
+        <item name="android:letterSpacing">
+            -0.02
+        </item>
+
+        <item name="android:textColor">
+            #696565
+        </item>
+
+    </style>
+
+    <style name="email">
+
+        <item name="android:textSize">
+            20sp
+        </item>
+
+        <item name="android:textColor">
+            #585975
+        </item>
+
         <item name="android:shadowColor">
-            #FFFFFF
+            #40000000
         </item>
+
         <item name="android:shadowDx">
             0
         </item>
+
         <item name="android:shadowDy">
-            2
+            4
         </item>
+
         <item name="android:shadowRadius">
-            80
+            4
         </item>
-    </style>
-    <style name="email">
-        <item name="android:textSize">   18sp
-        </item>
-        <item name="android:textColor">   #FFFFFF
-        </item>
+
     </style>
     <style name="password">
-        <item name="android:textSize">  18sp
+
+        <item name="android:textSize">
+            20sp
         </item>
-        <item name="android:textColor">  #FFFFFF
+
+        <item name="android:textColor">
+            #585975
         </item>
+
+        <item name="android:shadowColor">
+            #40000000
+        </item>
+
+        <item name="android:shadowDx">
+            0
+        </item>
+
+        <item name="android:shadowDy">
+            4
+        </item>
+
+        <item name="android:shadowRadius">
+            4
+        </item>
+
     </style>
 
     <style name="validate">
@@ -63,9 +116,7 @@
         <item name="android:textSize">
             18sp
         </item>
-        <item name="android:textColor">
-            #FBDF00
-        </item>
+        <item name="android:textColor">#000000</item>
         <item name="android:shadowColor">
             #FFFFFF
         </item>
@@ -95,7 +146,7 @@
     <style name="already_hav">
         <item name="android:textSize">   18sp
         </item>
-        <item name="android:textColor">   #FBDF00
+        <item name="android:textColor">   #000000
         </item>
         <item name="android:shadowColor">   #FFFFFF
         </item>
@@ -105,6 +156,22 @@
         </item>
         <item name="android:shadowRadius">  80
         </item>
+    </style>
+
+    <style name="login_first">
+
+        <item name="android:textSize">
+            20sp
+        </item>
+
+        <item name="android:letterSpacing">
+            -0.02
+        </item>
+
+        <item name="android:textColor">
+            #696565
+        </item>
+
     </style>
 
 </resources>

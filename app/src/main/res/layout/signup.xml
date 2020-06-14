@@ -3,121 +3,69 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F3665B">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/Create_an_account"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="67dp"
-        android:text="Create an account"
-        android:textAppearance="@style/login"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="104dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="42dp"
+        android:layout_marginTop="52dp"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="0sp"
+        android:text="Sign up"
+        android:textAppearance="@style/hello"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/login_first"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="42dp"
+        android:layout_marginTop="21dp"
+        android:gravity="top"
+        android:text="Sign up free now"
+        android:textAppearance="@style/login_first"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Create_an_account" />
+
+    <TextView
         android:id="@+id/Tag_Create_Name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="6dp"
-        android:gravity="center"
+        android:layout_width="330dp"
+        android:layout_height="28dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="42dp"
+        android:layout_marginTop="85dp"
+        android:gravity="top"
         android:text="Full name"
-        android:textAppearance="@style/full_name"
-        app:layout_constraintBottom_toTopOf="@+id/Create_FullName"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:textAppearance="@style/email"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_first" />
 
     <EditText
         android:id="@+id/Create_FullName"
-        android:layout_width="280dp"
-        android:layout_height="35dp"
+        android:layout_width="294dp"
+        android:layout_height="52dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/border_textbox"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/background_edittext"
         android:hint="Full name"
         android:paddingLeft="16dp"
         android:textColorHint="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/Tag_Create_Email"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/Tag_Create_Email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="6dp"
-        android:gravity="center"
-        android:text="Email"
-        android:textAlignment="center"
-        android:textAppearance="@style/email"
-        app:layout_constraintBottom_toTopOf="@+id/Create_Email"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/Create_Email"
-        android:layout_width="280dp"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/border_textbox"
-        android:gravity="center_vertical"
-        android:hint="Email"
-        android:paddingLeft="16dp"
-        android:textColorHint="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/Tag_Pass"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/Tag_Pass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="6dp"
-        android:gravity="center"
-        android:text="Password"
-        android:textAppearance="@style/password"
-        app:layout_constraintBottom_toTopOf="@+id/Create_Password"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/Create_Password"
-        android:layout_width="280dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/border_textbox"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:paddingLeft="16dp"
-        android:textColorHint="#FFFFFF"
-        app:layout_constraintBottom_toTopOf="@+id/Create_validate"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/Create_validate"
-        android:layout_width="343dp"
-        android:layout_height="48dp"
-        android:layout_marginBottom="40dp"
-        android:background="@drawable/createanaccount_background"
-        android:gravity="center_horizontal|center"
-        android:text="Validate"
-        android:textAppearance="@style/validate"
-        app:layout_constraintBottom_toTopOf="@+id/Create_Login"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/Tag_Create_Name"
+        app:layout_constraintTop_toBottomOf="@+id/Tag_Create_Name" />
 
     <TextView
         android:id="@+id/Create_Login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="139dp"
+        android:layout_marginBottom="72dp"
         android:gravity="center_horizontal|center"
         android:text="Already have an account ? Login"
         android:textAppearance="@style/already_hav"
@@ -126,6 +74,70 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/Create_Email"
+        android:layout_width="294dp"
+        android:layout_height="52dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/background_edittext"
+        android:gravity="center_vertical"
+        android:hint="Email"
+        android:paddingLeft="16dp"
+        android:textColorHint="#FFFFFF"
+        app:layout_constraintStart_toStartOf="@+id/Tag_Create_Email"
+        app:layout_constraintTop_toBottomOf="@+id/Tag_Create_Email" />
+
+    <EditText
+        android:id="@+id/Create_Password"
+        android:layout_width="294dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/background_edittext"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:paddingLeft="16dp"
+        android:textColorHint="#FFFFFF"
+        app:layout_constraintStart_toStartOf="@+id/Tag_Pass"
+        app:layout_constraintTop_toBottomOf="@+id/Tag_Pass" />
+
+    <Button
+        android:id="@+id/Create_validate"
+        android:layout_width="343dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/createanaccount_background"
+        android:gravity="center_horizontal|center"
+        android:text="Sign up"
+        android:textAppearance="@style/validate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Create_Password" />
+
+    <TextView
+        android:id="@+id/Tag_Create_Email"
+        android:layout_width="330dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="5dp"
+        android:gravity="left"
+        android:text="Email"
+        android:textAppearance="@style/email"
+        app:layout_constraintStart_toStartOf="@+id/Create_FullName"
+        app:layout_constraintTop_toBottomOf="@+id/Create_FullName" />
+
+    <TextView
+        android:id="@+id/Tag_Pass"
+        android:layout_width="330dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="5dp"
+        android:gravity="left"
+        android:text="Password"
+        android:textAppearance="@style/password"
+        app:layout_constraintStart_toStartOf="@+id/Create_Email"
+        app:layout_constraintTop_toBottomOf="@+id/Create_Email" />
 
     <ProgressBar
         android:id="@+id/Create_progressBar"
