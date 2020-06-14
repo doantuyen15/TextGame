@@ -1,9 +1,9 @@
 package com.exercises.textgame
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,6 +14,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.exercises.textgame.adapters.ChatLogAdapter
 import com.exercises.textgame.adapters.GameAdapter
+import com.exercises.textgame.fragment.AlertDialogFragment
 import com.exercises.textgame.models.*
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_game.*
@@ -23,7 +24,6 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class GameActivity : BaseActivity() {
-
     private lateinit var adapter: GameAdapter
     private lateinit var adapterChatLog : ChatLogAdapter
     private val playerListStatus = ArrayList<PlayerStatus?>()
@@ -39,6 +39,8 @@ class GameActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
+        setDialogAlert(dialogListener)
+        checkNetworkConnectivity()
 
         val data = intent.extras
         joinedRoomKey = data?.getString(ROOM_INFO_KEY)
@@ -79,17 +81,11 @@ class GameActivity : BaseActivity() {
         }
     }
 
-//    object FromGameCallBack : CallBack {
+/*    object FromGameCallBack : CallBack {
 //        override fun onNegativeButtonClick() {
 //            exitProcess(-1)
 //        }
 //    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        Log.d("BackButton", "pressed")
-        finish()
-    }
 
 //    private fun getConnectionState() {
 //        val dialog = AlertDialog.Builder(this@GameActivity)
@@ -117,7 +113,7 @@ class GameActivity : BaseActivity() {
 //                Log.d("getConnectionState", "Listener was cancelled with error: $error")
 //            }
 //        })
-//    }
+    } */
 
     private fun getSpeech(languageKey: String) {
         val mIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -191,7 +187,7 @@ class GameActivity : BaseActivity() {
         val command = HashMap<String, Any>()
         when (cmd){
             COMMAND_ATTACK_KEY -> {
-                command["attack$joinedRoomKey"] = mapOf(uid to resultTime)
+                command["attack$joinedRoomKey"] = mapOf(uid to (System.currentTimeMillis() - resultTime))
                 commandRef.updateChildren(command)
             }
             COMMAND_START_KEY -> {
@@ -292,28 +288,37 @@ class GameActivity : BaseActivity() {
 //        TODO("Not yet implemented")
     }
 
+    private fun startCountDown(timeOut: Long) {
+        val counter = findViewById<ProgressBar>(R.id.quizProgressBar)
+        val progressAnimator = ObjectAnimator.ofInt(counter, "progress", 1000, 0)
+        progressAnimator.duration = timeOut
+        progressAnimator.interpolator = LinearInterpolator()
+        progressAnimator.start()
+        resultTime = System.currentTimeMillis()
+    }
+
     private fun showQuiz(r: Int, quiz: Quiz) {
         resultTime = 0L
         cv_quiz.visibility = View.VISIBLE
         val round = findViewById<TextView>(R.id.tvRound)
         val content = findViewById<TextView>(R.id.tvQuizTitle)
-        val counter = findViewById<ProgressBar>(R.id.quizProgressBar)
         val timeOut = quiz.timeOut
-        counter.max = timeOut.toInt()
         round.text = r.toString()
         content.text = quiz.content
-        val timer = object : CountDownTimer(timeOut, 100) {
-            override fun onFinish() {
-                counter.progress = 0
-            }
+        startCountDown(timeOut)
 
-            override fun onTick(p0: Long) {
-                resultTime = timeOut - p0
-                counter.progress = p0.toInt()
-//                Log.d("show quiz", "${counter.progress}")
-            }
-        }
-        timer.start()
+//        val timer = object : CountDownTimer(timeOut, 100) {
+//            override fun onFinish() {
+//                counter.progress = 0
+//            }
+//
+//            override fun onTick(p0: Long) {
+//                resultTime = timeOut - p0
+//                counter.progress = p0.toInt()
+////                Log.d("show quiz", "${counter.progress}")
+//            }
+//        }
+//        timer.start()
     }
 
     private fun updateLastMessage(newMessage: DataSnapshot) {
@@ -414,5 +419,28 @@ class GameActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+//    override fun onDetachDialog() {
+//        setResult(RESULT_CANCELED)
+//        finish()
+//    }
+
+    private val dialogListener = object: AlertDialogFragment.DetachDialogListener {
+        override fun onDetachDialog() {
+            setResult(RESULT_CANCELED)
+            finish()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        removeNetworkListener()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 }

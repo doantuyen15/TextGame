@@ -11,6 +11,6 @@
         android:topLeftRadius="50dp"
         android:topRightRadius="50dp" />
     <size
-        android:height="20dp"
-        android:width="20dp" />
+        android:height="30dp"
+        android:width="30dp" />
 </shape>

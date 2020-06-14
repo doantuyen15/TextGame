@@ -6,16 +6,33 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/progressBarMain"
+    <LinearLayout
+        android:id="@+id/loadingFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnPlay"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/progress_bar" />
+        app:layout_constraintTop_toTopOf="@+id/Sign_out">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/progressBarMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/progress_bar" />
+
+        <TextView
+            android:id="@+id/tvDialogConnecting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/connecting_to_server"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/Sign_out"
@@ -38,23 +55,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvDialogConnecting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/connecting_to_server"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressBarMain"
-        android:visibility="invisible"/>
-
-    <Button
-        android:id="@+id/btnTest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Test Animation"
-        app:layout_constraintBottom_toTopOf="@id/btnPlay"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

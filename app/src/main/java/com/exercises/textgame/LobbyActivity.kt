@@ -1,9 +1,11 @@
 package com.exercises.textgame
 
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.exercises.textgame.adapters.LobbyAdapter
+import com.exercises.textgame.fragment.AlertDialogFragment
 import com.exercises.textgame.models.*
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -26,7 +28,8 @@ class LobbyActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lobby)
         setProgressBar(progressBar)
-
+        setDialogAlert(dialogListener)
+        checkNetworkConnectivity()
         getCurrentUser()
         listenForLobby()
 
@@ -135,8 +138,8 @@ class LobbyActivity : BaseActivity() {
 
     private fun startGameActivity(roomKey: String?, hostName: String?=null, roomTitle: String?=null){
         val intent = Intent(this, GameActivity::class.java)
-        roomKey?.let {
-            intent.putExtra(ROOM_INFO_KEY, it)
+        roomKey?.let { key ->
+            intent.putExtra(ROOM_INFO_KEY, key)
             intent.putExtra(USER_UID_KEY, uid)
             intent.putExtra(CHILD_HOSTNAME_KEY, hostName)
             val defaultUserStatus = HashMap<String, Any?>()
@@ -146,7 +149,7 @@ class LobbyActivity : BaseActivity() {
 
             if (hostName != null) { //create new room
                 val createRoomInfo =  RoomInfo(hostName, roomTitle, QUIZ_GAME_KEY, user, defaultUserStatus)
-                dbGetRefRoom(it)
+                dbGetRefRoom(key)
                     .setValue(createRoomInfo)
                     .addOnSuccessListener {
                         userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(roomKey)
@@ -156,10 +159,10 @@ class LobbyActivity : BaseActivity() {
             } else {
                 val userJoinToRoom = HashMap<String, Any?>()
                 userJoinToRoom[CHILD_JOINEDUSER_KEY] = user
-                dbGetRefRoom(it)
+                dbGetRefRoom(key)
                     .child(CHILD_JOINEDUSER_KEY)
                     .updateChildren(user as Map<String, Any>)
-                dbGetRefRoom(it)
+                dbGetRefRoom(key)
                     .child(CHILD_USERSTATUS_KEY)
                     .updateChildren(defaultUserStatus)
                     .addOnSuccessListener {
@@ -171,5 +174,22 @@ class LobbyActivity : BaseActivity() {
         }
     }
 
+    private val dialogListener = object: AlertDialogFragment.DetachDialogListener {
+        override fun onDetachDialog() {
+            setResult(RESULT_CANCELED)
+            finish()
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        setResult(Activity.RESULT_CANCELED)
+        finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        removeNetworkListener()
+    }
 }
 

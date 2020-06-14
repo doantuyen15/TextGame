@@ -1,5 +1,6 @@
 package com.exercises.textgame
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -14,21 +15,18 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : BaseActivity(){
+class MainActivity : BaseActivity() {
 
     //fetch current user
     private val currentUser = Firebase.auth.currentUser
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        getConnectionState()
-        val dialog = AlertDialogFragment()
-//        dialog.show(supportFragmentManager,"aa")
+//        setDialogAlert(detachListener)
+//        checkNetworkConnectivity()
+
         btnPlay.setOnClickListener {
-            progressBarMain.visibility = View.VISIBLE
-            tvDialogConnecting.visibility = View.VISIBLE
-            progressBarMain.playAnimation()
+            loadingFrame.visibility = View.VISIBLE
             btnPlay.isEnabled = false
             startGame()
         }
@@ -36,27 +34,17 @@ class MainActivity : BaseActivity(){
         Sign_out.setOnClickListener {
             signOut()
         }
-
-        btnTest.setOnClickListener {
-            dialog.show(supportFragmentManager,"aa")
-        }
-
-//        var fbquery = commandRef.child(COMMAND_DISCONNECTED_KEY).setValue("online")
-//        commandRef.child(COMMAND_DISCONNECTED_KEY)
-//            .onDisconnect()     // Set up the disconnect hook
-//            .setValue("offline");
-
     }
 
-    override fun onPause() {
-        super.onPause()
-        progressBarMain.visibility = View.INVISIBLE
-        tvDialogConnecting.visibility = View.INVISIBLE
-    }
-
-    override fun onResume() {
-        super.onResume()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         btnPlay.isEnabled = true
+        if (requestCode == 123 && resultCode == Activity.RESULT_CANCELED) {
+            Log.d("main activity", "return from GameActivity")
+        }
+        if (requestCode == 456 && resultCode == Activity.RESULT_CANCELED) {
+            Log.d("main activity", "return from Lobby")
+        }
     }
 
     private fun signOut() {
@@ -71,7 +59,6 @@ class MainActivity : BaseActivity(){
     }
 
     private fun startGame() {
-
         val userId = currentUser?.uid
         val displayName = currentUser?.displayName
         val lobby = Intent(this, LobbyActivity::class.java)
@@ -80,12 +67,15 @@ class MainActivity : BaseActivity(){
         val gameActivity = Intent(this, GameActivity::class.java)
         var roomKey: String = ""
         if (userId != null) {
-            userRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            val ref = userRef
+//            ref.keepSynced(true)
+            ref.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
                     Log.d("MainActivity Start Game", "error at $p0")
                 }
 
                 override fun onDataChange(p0: DataSnapshot) {
+                    Log.d("MainActivity Start Game", "got user last room key")
                     if (p0.hasChild(CHILD_CURRENTROOMID_KEY)) {
                         roomKey = p0.child(CHILD_CURRENTROOMID_KEY).value.toString()
                         gameActivity.putExtra(ROOM_INFO_KEY, roomKey)
@@ -93,7 +83,8 @@ class MainActivity : BaseActivity(){
 //                        gameActivity.putExtra(USER_USERNAME_KEY, displayName)
                         checkExistRoom(roomKey, gameActivity, lobby)
                     } else {
-                        startActivity(lobby)
+                        startActivityForResult(lobby, 456)
+                        loadingFrame.visibility = View.INVISIBLE
                     }
                 }
             })
@@ -105,30 +96,42 @@ class MainActivity : BaseActivity(){
         gameActivity: Intent,
         lobby: Intent
     ) {
-        roomRef.addListenerForSingleValueEvent(object: ValueEventListener{
+        roomRef.orderByKey().equalTo(roomKey).addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
-//                TODO("Not yet implemented")
+                Log.d("MainActivity Start Game", "error at $p0")
             }
 
             override fun onDataChange(p0: DataSnapshot) {
+                Log.d("MainActivity Start Game", "key available")
                 if(p0.hasChild(roomKey)){
-                    startActivity(gameActivity)
-                } else{
-                    userRef.child(currentUser!!.uid).updateChildren(mapOf(CHILD_CURRENTROOMID_KEY to null))
-                    startActivity(lobby)
+                    startActivityForResult(gameActivity, 123)
+                } else {
+                    userRef.child(currentUser!!.uid)
+                        .updateChildren(mapOf(CHILD_CURRENTROOMID_KEY to null))
+                    startActivityForResult(lobby, 456)
                 }
+                loadingFrame.visibility = View.INVISIBLE
             }
 
         })
     }
 
-//    private val dialog = AlertDialog.Builder(this)
-//        .setCancelable(false)
-//        .setView(R.layout.layout_loading_dialog)
-//        .setNegativeButton("Cancel") { _, _ ->
-//            finish()
-//        }
-//        .create()
+    private val detachListener = object: AlertDialogFragment.DetachDialogListener {
+        override fun onDetachDialog() {
+            finish()
+        }
+    }
 
+    override fun onStop() {
+        super.onStop()
+    }
 
+    override fun onPause() {
+        super.onPause()
+        Log.d("MainActivity", "activity pause")
+    }
+
+//    override fun onDetachDialog() {
+//        finish()
+//    }
 }
