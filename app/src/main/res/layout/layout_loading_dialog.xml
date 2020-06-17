@@ -28,7 +28,7 @@
         android:layout_weight="4"
         android:gravity="center"
         android:text="@string/try_to_reconnect"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="#60E6CD"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/btnDialogCancel"
