@@ -48,7 +48,6 @@
                 android:lineSpacingExtra="8sp"
                 android:text="@string/lorem"
                 android:textAlignment="center"
-                android:textColor="@color/colorPrimaryDark"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:typeface="normal"

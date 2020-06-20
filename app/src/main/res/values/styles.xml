@@ -4,13 +4,13 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">#60E6CD</item>
-        <item name="colorPrimaryDark">#60E6CD</item>
+        <item name="colorPrimaryDark">#36859E</item>
         <item name="colorAccent">#60E6CD</item>
     </style>
     <style name="FullScreenDialogStyle" parent="Theme.MaterialComponents.Dialog">
         <item name="android:windowNoTitle">true</item>
-        <item name="colorPrimaryDark">#60E6CD</item>
-        <item name="colorPrimary">#60E6CD</item>
+        <item name="colorPrimaryDark">#3AABCF</item>
+        <item name="colorPrimary">#3AABCF</item>
 
         <!-- Set this to true if you want Full Screen without status bar -->
         <item name="android:windowFullscreen">true</item>

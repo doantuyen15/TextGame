@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/cat"
+    android:background="@drawable/background_splash3"
     tools:context=".SplashActivity">
 
     <TextView
         android:id="@+id/logo_splash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="Splash"
-        android:textSize="24sp"
+        android:layout_marginTop="108dp"
+        android:text="WELCOME"
+        android:textColor="#25C6C8"
+        android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/backgroun_chatbox"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -80,7 +81,7 @@
         android:layout_marginStart="8dp"
         android:background="@color/trans"
         android:rotation="180"
-        android:tint="#60E6CD"
+        android:tint="#19647C"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/llPlayerList"
@@ -117,7 +118,7 @@
         android:layout_height="0dp"
         android:layout_marginEnd="4dp"
         android:background="@color/trans"
-        android:tint="#60E6CD"
+        android:tint="#19647C"
         app:layout_constraintBottom_toBottomOf="@id/btnSendMessage"
         app:layout_constraintEnd_toStartOf="@id/btnSendMessage"
         app:layout_constraintTop_toTopOf="@id/btnSendMessage"
