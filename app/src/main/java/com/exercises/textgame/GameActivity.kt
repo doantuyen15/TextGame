@@ -104,10 +104,6 @@ class GameActivity : BaseActivity() {
             result?.let {
                 sendMessage(it[0])
             }
-            Log.d(
-                GameActivity::class.java.simpleName,
-                "RecordSpeechResult*****************************${result?.let{it[0]}}"
-            )
         }
     }
 
@@ -177,7 +173,7 @@ class GameActivity : BaseActivity() {
                 if(playerList.count() > 1){
                     playerList.remove(uid)
                     if (isHost){
-                        val newHost = playerList.entries.first().key
+                        val newHost = playerList.entries.first().value
                         dbGetRefRoom(joinedRoomKey).apply {
                             child(CHILD_HOSTNAME_KEY)
                                 .setValue(newHost)
@@ -188,6 +184,7 @@ class GameActivity : BaseActivity() {
                     commandRef.child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY)
                         .child(uid)
                         .setValue(null)
+
                 } else {
                     commandRef.child(joinedRoomKey)
                         .setValue("quit")
@@ -380,19 +377,15 @@ class GameActivity : BaseActivity() {
     }
 
     private fun fetchPlayer(newJoinedPlayer: MutableIterable<DataSnapshot>) {
+        playerList.clear()
         newJoinedPlayer.forEach {
             val id = it.key.toString()
             val playerName = it.value.toString()
-            if (!playerList.containsKey(id)) {
-                playerList[id] = playerName
-                playerIndex.add(id)
-                playerListStatus.add(PlayerStatus(playerName))
-                adapter.notifyDataSetChanged()
-            } else {
-                playerList.remove(id)
-                playerIndex.remove(id)
-            }
+            playerList[id] = playerName
+            playerIndex.add(id)
+            playerListStatus.add(PlayerStatus(playerName))
         }
+        adapter.notifyDataSetChanged()
     }
 
     private fun updatePlayerStatusBar(isRefresh: Boolean = false){
