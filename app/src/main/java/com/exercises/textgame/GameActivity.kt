@@ -229,21 +229,21 @@ class GameActivity : BaseActivity() {
                             .setValue("online")
                     }
                 }
-                if (p0.key == CHILD_JOINEDUSER_KEY) {
-                    fetchPlayer(p0.children)
-                }
-                if (p0.key == CHILD_PLAYERSTATUS_KEY) {
-                    updatePlayerStatus(p0.children)
-                }
-                if (p0.key == CHILD_MESSAGE_KEY) {
-                    updateLastMessage(p0.children.last())
-                }
-                if (p0.key == CHILD_ROUND_KEY) {
-                    isAnswer = false
-                    p0.getValue(Round::class.java)?.let { value -> getQuiz(value) }
-                }
-//            Log.d("fetchCurrentRoomInfo", "Changed*****************************${p0.key}")
             }
+            if (p0.key == CHILD_JOINEDUSER_KEY) {
+                fetchPlayer(p0.children)
+            }
+            if (p0.key == CHILD_PLAYERSTATUS_KEY) {
+                updatePlayerStatus(p0.children)
+            }
+            if (p0.key == CHILD_MESSAGE_KEY) {
+                updateLastMessage(p0.children.last())
+            }
+            if (p0.key == CHILD_ROUND_KEY) {
+                isAnswer = false
+                p0.getValue(Round::class.java)?.let { value -> getQuiz(value) }
+            }
+//            Log.d("fetchCurrentRoomInfo", "Changed*****************************${p0.key}")
         }
 
         override fun onChildAdded(p0: DataSnapshot, p1: String?) {
@@ -273,7 +273,7 @@ class GameActivity : BaseActivity() {
             }
             if(p0.key == CHILD_ATTACKER_KEY){
                 if(p0.value.toString() == uid){
-                    attackOtherUser()
+//                    attackOtherUser()
                 }
             }
             if(p0.key == CHILD_DEFENDER_KEY){
@@ -307,13 +307,9 @@ class GameActivity : BaseActivity() {
         resultDialog.show(supportFragmentManager, "result")
     }
 
-    private fun fetchCurrentRoomInfo(){
-            dbGetRefRoom(joinedRoomKey).addChildEventListener(roomEventListener)
+    private fun fetchCurrentRoomInfo() {
+        dbGetRefRoom(joinedRoomKey).addChildEventListener(roomEventListener)
 //        adapter.add(RoomHolder(playerList))
-    }
-
-    private fun attackOtherUser() {
-//        TODO("Not yet implemented")
     }
 
     private fun getQuiz(round: Round) {
@@ -335,19 +331,14 @@ class GameActivity : BaseActivity() {
             }
             .addOnFailureListener {
                 Log.d("get quiz", "failed with error: ${it.message}")
-                retryToConnect()
+//                retryToConnect()
             }
-    }
-
-    private fun retryToConnect() {
-//        TODO("Not yet implemented")
     }
 
     private fun startCountDown(timeOut: Long, syncTime: Long) {
         val counter = findViewById<ProgressBar>(R.id.quizProgressBar)
         val progress = (syncTime.toFloat().div(timeOut)*1000).toInt()
 //        counter.progress = progress
-        Log.e("get quiz", "timeinprogress: ${counter.progress}")
         val progressAnimator = ObjectAnimator.ofInt(counter, "progress", progress, 0)
         progressAnimator.duration = syncTime
         progressAnimator.interpolator = LinearInterpolator()
@@ -392,7 +383,6 @@ class GameActivity : BaseActivity() {
         newJoinedPlayer.forEach {
             val id = it.key.toString()
             val playerName = it.value.toString()
-            Log.e("updateUserStatus","updateError*****************************${playerName}")
             if (!playerList.containsKey(id)) {
                 playerList[id] = playerName
                 playerIndex.add(id)
