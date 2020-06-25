@@ -4,6 +4,8 @@ package com.exercises.textgame
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import com.exercises.textgame.adapters.LobbyAdapter
 import com.exercises.textgame.fragment.AlertDialogFragment
 import com.exercises.textgame.models.*
@@ -33,12 +35,7 @@ class LobbyActivity : BaseActivity() {
         getCurrentUser()
         listenForLobby()
 
-        adapter = LobbyAdapter(
-            this,
-            roomList,
-            listener
-        )
-
+        adapter = LobbyAdapter(this, roomList, listener)
         rvGameRoomList.adapter = adapter
         edtRoomTitle.hint = userName
 
@@ -60,37 +57,40 @@ class LobbyActivity : BaseActivity() {
         //return currentUser
     }
 
+    private val lobbyEventListener = object : ChildEventListener {
+        override fun onCancelled(p0: DatabaseError) {
+            //
+        }
+
+        override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            //
+        }
+
+        override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+//            Log.d(LobbyActivity::class.java.simpleName, "Lobbychanged****************${p0}")
+            val keyChange = p0.key.toString()
+            roomList[roomKeyList.indexOf(keyChange)] = p0.getValue(RoomInfo::class.java)!!
+            adapter.notifyItemChanged(roomKeyList.indexOf(keyChange))
+        }
+
+        override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+            if(p0.key != PREVENT_REMOVE_KEY) {
+                addNewRoom(p0)
+            }
+//            Log.d(LobbyActivity::class.java.simpleName,"Lobbychanged****************${p1}")
+        }
+
+        override fun onChildRemoved(p0: DataSnapshot) {
+            val index = roomKeyList.indexOf(p0.key)
+            roomKeyList.removeAt(index)
+            roomList.removeAt(index)
+            adapter.notifyItemRemoved(index)
+        }
+
+    }
+
     private fun listenForLobby(){
-        roomRef.addChildEventListener(object : ChildEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-                //
-            }
-
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-                //
-            }
-
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                if(p0.key == CHILD_HOSTNAME_KEY || p0.key == CHILD_TITLE_KEY){
-                    updateLobby(p0)
-                }
-//                Log.d(LobbyActivity::class.java.simpleName,"Lobbychanged****************${p0.key}")
-            }
-
-            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                if(p0.key != PREVENT_REMOVE_KEY) {
-                    addNewRoom(p0)
-                }
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot) {
-                val index = roomKeyList.indexOf(p0.key)
-                roomKeyList.removeAt(index)
-                roomList.removeAt(index)
-                adapter.notifyItemRemoved(index)
-            }
-
-       })
+        roomRef.child(CHILD_LISTROOMS_KEY).addChildEventListener(lobbyEventListener)
     }
 
     private fun updateLobby(p0: DataSnapshot) {
@@ -116,7 +116,7 @@ class LobbyActivity : BaseActivity() {
         showProgressBar()
 //        btCreateGame.isEnabled = false
 
-        val hostName = userName
+//        val hostName = userName
         val roomTitle = if (edtRoomTitle.text.toString() == ""){
             "${userName}'s room"
         } else {
@@ -124,7 +124,7 @@ class LobbyActivity : BaseActivity() {
         }
         val roomKey = roomRef.push().key
 
-        startGameActivity(roomKey, hostName, roomTitle)
+        startGameActivity(roomKey, roomTitle, host = true)
         goneProgressBar()
 
     }
@@ -136,60 +136,75 @@ class LobbyActivity : BaseActivity() {
         }
     }
 
-    private fun startGameActivity(roomKey: String?, hostName: String?=null, roomTitle: String?=null){
+    @Suppress("IMPLICIT_CAST_TO_ANY")
+    private fun startGameActivity(roomKey: String?, roomTitle: String?=null, host: Boolean = false){
         val intent = Intent(this, GameActivity::class.java)
+        val dialog = AlertDialogFragment()
+        dialog.show(supportFragmentManager, "loading")
+
         roomKey?.let { key ->
             intent.putExtra(ROOM_INFO_KEY, key)
             intent.putExtra(USER_UID_KEY, uid)
-            intent.putExtra(CHILD_HOSTNAME_KEY, hostName)
-            val defaultUserStatus = HashMap<String, Any?>()
-            defaultUserStatus[uid] = PlayerStatus(userName)
+            intent.putExtra(USER_USERNAME_KEY, userName)
+//            val defaultUserStatus = HashMap<String, Any?>()
+//            defaultUserStatus[uid] = PlayerStatus(userName)
             val user = HashMap<String, String>()
             user[uid] = userName
 
-            if (hostName != null) { //create new room
-                val createRoomInfo =  RoomInfo(hostName, roomTitle, QUIZ_GAME_KEY, user, defaultUserStatus)
-                dbGetRefRoom(key)
-                    .setValue(createRoomInfo)
-                    .addOnSuccessListener {
-                        userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(roomKey)
-                        startActivity(intent)
-                        finish()
-                    }
+            if (host) { //create new room
+                val createRoomInfo =  RoomInfo(userName, roomTitle, QUIZ_GAME_KEY, user)
+                roomRef.apply {
+                    child(key)
+                        .setValue(createRoomInfo)
+                        .addOnSuccessListener {
+                            userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(key)
+                            startActivity(intent)
+                            finish()
+                        }
+                    child(CHILD_LISTROOMS_KEY)
+                        .updateChildren(mapOf(key to createRoomInfo))
+                }
             } else {
-                val userJoinToRoom = HashMap<String, Any?>()
-                userJoinToRoom[CHILD_JOINEDUSER_KEY] = user
-                dbGetRefRoom(key)
-                    .child(CHILD_JOINEDUSER_KEY)
-                    .updateChildren(user as Map<String, Any>)
-                dbGetRefRoom(key)
-                    .child(CHILD_USERSTATUS_KEY)
-                    .updateChildren(defaultUserStatus)
+                dbGetRefRoom(key).child(CHILD_JOINEDUSER_KEY)
+                    .child(uid)
+                    .setValue(userName)
                     .addOnSuccessListener {
-                        userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(roomKey)
+                        userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(key)
                         startActivity(intent)
+//                        dialog.setDismiss()
                         finish()
                     }
             }
         }
     }
 
+    private fun removeFirebaseListener() {
+        roomRef.removeEventListener(lobbyEventListener)
+    }
+
     private val dialogListener = object: AlertDialogFragment.DetachDialogListener {
         override fun onDetachDialog() {
-            setResult(RESULT_CANCELED)
             finish()
         }
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        setResult(Activity.RESULT_CANCELED)
-        finish()
+        val builder = AlertDialog.Builder(this)
+            .setMessage("Go back to menu?")
+            .setNegativeButton("Yes") { _, _ ->
+                setResult(Activity.RESULT_OK)
+                super.onBackPressed()
+                finish()
+            }
+            .setPositiveButton("Dismiss") { dialog, _ -> dialog?.dismiss() }
+        val dialog = builder.create();
+        dialog.show()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         removeNetworkListener()
+        removeFirebaseListener()
     }
 }
 

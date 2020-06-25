@@ -14,8 +14,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -37,6 +36,7 @@ open class BaseActivity : AppCompatActivity(){
 //    private val dialog = AlertDialogFragment()
     private lateinit var dialog: AlertDialogFragment
     private lateinit var cm : ConnectivityManager
+    private var isReconnect = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +46,37 @@ open class BaseActivity : AppCompatActivity(){
     private val networkListener = object: ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
-            showOrHideProgressDialog(true)
-            fireBaseDataBaseInstance.goOnline()
+            if(isReconnect) { // run below function when reconnecting
+                //                reconnectToServer()
+                fireBaseDataBaseInstance.goOnline()
+                connectedRef.addValueEventListener(firebaseConnectivityListener)
+            }
+            isReconnect = true
         }
         override fun onLost(network: Network?) {
             showOrHideProgressDialog(false)
             fireBaseDataBaseInstance.goOffline()
+            removeNetworkListener(true)
         }
     }
+
+//    private fun reconnectToServer() {
+//        //send command to reconnect
+//        val command = HashMap<String, String>()
+//        command[COMMAND_RECONNECTED_KEY] = "hihi"
+//        var isDone = false
+//        repeat(3) {
+//            if (isDone) {
+//                return
+//            } else {
+//                commandRef.setValue(command)
+//                    .addOnCompleteListener {
+//                        isDone = true
+//                    }
+//            }
+//        }
+//
+//    }
 
     fun setDialogAlert(mListener: AlertDialogFragment.DetachDialogListener){
         dialog = AlertDialogFragment(mListener)
@@ -65,8 +88,12 @@ open class BaseActivity : AppCompatActivity(){
         }
     }
 
-    fun removeNetworkListener() {
-        cm.unregisterNetworkCallback(networkListener)
+    fun removeNetworkListener(firebase: Boolean = false) {
+        if(firebase){
+            connectedRef.removeEventListener(firebaseConnectivityListener)
+        } else {
+            cm.unregisterNetworkCallback(networkListener)
+        }
     }
 
     fun checkGooglePlayService(): Boolean {
@@ -102,28 +129,19 @@ open class BaseActivity : AppCompatActivity(){
         progressBar?.visibility = View.GONE
     }
 
-//    fun getConnectionState() {
-//        val listener = object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                val connected = snapshot.getValue(Boolean::class.java) ?: false
-//                if (!connected) {
-//                    showProgressDialog(true)
-//                    Log.d("getConnectionState", "disconnected to server")
-//                } else{
-//                    showProgressDialog(false)
-//                    Log.d("getConnectionState", "connected to server")
-////                    if(removeListenerAfter) connectedRef.removeEventListener(listener)
-////                    if(dialog != null && dialog.isShowing){
-////                        dialog.dismiss()
-////                    }
-//                }
-//            }
-//            override fun onCancelled(error: DatabaseError) {
-//                Log.d("getConnectionState", "Listener was cancelled with error: $error")
-//            }
-//        }
-//        connectedRef.addValueEventListener(listener)
-//    }
+    private val firebaseConnectivityListener = object : ValueEventListener {
+        override fun onCancelled(p0: DatabaseError) {
+        }
+
+        override fun onDataChange(p0: DataSnapshot) {
+            val connected = p0.getValue(Boolean::class.java) ?: false
+            if (connected) {
+                showOrHideProgressDialog(true)
+                removeNetworkListener(true)
+            }
+        }
+
+    }
 
     fun fetchUsers(){
             currentUser?.let {
@@ -166,7 +184,10 @@ const val LANGUAGE_EN_KEY = "en_US"
 const val REQUEST_SPEECH_CODE = 3000
 const val CHILD_CURRENTROOMID_KEY = "currentRoomId"
 const val PREVENT_REMOVE_KEY = "preventRemoveKey"
+const val CHILD_LISTROOMS_KEY = "listrooms"
 
 const val COMMAND_ATTACK_KEY = "attack"
 const val COMMAND_START_KEY = "start"
 const val COMMAND_DISCONNECTED_KEY = "disconnected"
+const val COMMAND_RECONNECTED_KEY = "reconnected"
+const val COMMAND_QUIT_KEY = "quit"

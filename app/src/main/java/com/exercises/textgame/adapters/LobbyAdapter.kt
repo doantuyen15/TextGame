@@ -24,7 +24,7 @@ class LobbyAdapter(private val context: Context, var data: ArrayList<RoomInfo>, 
 
     override fun onBindViewHolder(holder: LobbyVH, position: Int) {
         val room = data[position]
-        if(room.roomStatus == "playing"){
+        if (room.roomStatus == "start") {
             holder.title.setTextColor(Color.parseColor("#37EE00A7"))
         }
         holder.title.text = room.roomTitle

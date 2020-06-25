@@ -16,7 +16,7 @@ import androidx.fragment.app.DialogFragment
 import com.exercises.textgame.R
 import kotlinx.android.synthetic.main.layout_loading_dialog.*
 
-class AlertDialogFragment(private val mListener: DetachDialogListener): DialogFragment() {
+class AlertDialogFragment(private val mListener: DetachDialogListener?=null): DialogFragment() {
     private var firstTry = true
 //    private lateinit var mListener: DetachDialogListener
 
@@ -34,7 +34,7 @@ class AlertDialogFragment(private val mListener: DetachDialogListener): DialogFr
         val buttonCancel = rootView.findViewById<Button>(R.id.btnDialogCancel)
         buttonCancel.setOnClickListener {
             dialog?.dismiss()
-            mListener.onDetachDialog()
+            mListener?.onDetachDialog()
         }
         return rootView
     }
@@ -59,6 +59,7 @@ class AlertDialogFragment(private val mListener: DetachDialogListener): DialogFr
             lavLoading.addAnimatorUpdateListener {valueAnimator ->
                 val progress = (valueAnimator.animatedValue as Float * 100).toInt()
                 // animation with 841 frame
+                mListener?.onReconnected()
                 if(progress >= 47){
                     lavLoading.cancelAnimation()
                     if (dialog?.isShowing!!) {
@@ -81,5 +82,6 @@ class AlertDialogFragment(private val mListener: DetachDialogListener): DialogFr
 
     interface DetachDialogListener {
         fun onDetachDialog()
+        fun onReconnected() {}
     }
 }

@@ -3,15 +3,13 @@ package com.exercises.textgame.models
 data class RoomInfo(val hostName: String?=null,
                     val roomTitle: String?=null,
                     val gameType: String,
-                    val joinedUser: Any?=null,
-                    val userStatus: Any?=null,
-                    val roomStatus: String?=null,
-                    val attacker: String?=null
+                    val joinedUser: HashMap<String, String>?=null,
+                    var roomStatus: String?="create"
                     )
 {
-    constructor() : this("","","",null,null,null,null)
+    constructor() : this("","","",null,null)
 }
-const val CHILD_USERSTATUS_KEY = "userStatus"
+const val CHILD_PLAYERSTATUS_KEY = "playerStatus"
 const val CHILD_JOINEDUSER_KEY = "joinedUser"
 const val CHILD_ATTACKER_KEY = "attacker"
 const val CHILD_DEFENDER_KEY = "defender"
