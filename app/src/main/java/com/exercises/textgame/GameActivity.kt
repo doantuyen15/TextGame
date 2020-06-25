@@ -175,6 +175,16 @@ class GameActivity : BaseActivity() {
             }
             COMMAND_QUIT_KEY -> {
                 if(playerList.count() > 1){
+                    playerList.remove(uid)
+                    if (isHost){
+                        val newHost = playerList.entries.first().key
+                        dbGetRefRoom(joinedRoomKey).apply {
+                            child(CHILD_HOSTNAME_KEY)
+                                .setValue(newHost)
+                            child(CHILD_MESSAGE_KEY)
+                                .setValue(Message("Bot", "$userName has left\nNew host is $newHost"))
+                        }
+                    }
                     commandRef.child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY)
                         .child(uid)
                         .setValue(null)
@@ -189,6 +199,12 @@ class GameActivity : BaseActivity() {
                     .push()
                     .setValue(Message("Bot", "$userName has reconnected"))
             }
+            COMMAND_STAY_KEY -> {
+                if(isHost) {
+                    commandRef.child(joinedRoomKey)
+                        .setValue("restart")
+                }
+            }
         }
     }
 
@@ -202,8 +218,8 @@ class GameActivity : BaseActivity() {
         }
 
         override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-            if(p0.key == CHILD_ROOMSTATUS_KEY){
-                when (p0.value.toString()){
+            if (p0.key == CHILD_ROOMSTATUS_KEY) {
+                when (p0.value.toString()) {
                     "finish" -> {
                         showResult()
                     }
@@ -213,21 +229,21 @@ class GameActivity : BaseActivity() {
                             .setValue("online")
                     }
                 }
-            }
-            if(p0.key == CHILD_JOINEDUSER_KEY){
-                fetchPlayer(p0.children)
-            }
-            if(p0.key == CHILD_PLAYERSTATUS_KEY){
-                updatePlayerStatus(p0.children)
-            }
-            if(p0.key == CHILD_MESSAGE_KEY){
-                updateLastMessage(p0.children.last())
-            }
-            if(p0.key == CHILD_ROUND_KEY){
-                isAnswer = false
-                p0.getValue(Round::class.java)?.let { value -> getQuiz(value) }
-            }
+                if (p0.key == CHILD_JOINEDUSER_KEY) {
+                    fetchPlayer(p0.children)
+                }
+                if (p0.key == CHILD_PLAYERSTATUS_KEY) {
+                    updatePlayerStatus(p0.children)
+                }
+                if (p0.key == CHILD_MESSAGE_KEY) {
+                    updateLastMessage(p0.children.last())
+                }
+                if (p0.key == CHILD_ROUND_KEY) {
+                    isAnswer = false
+                    p0.getValue(Round::class.java)?.let { value -> getQuiz(value) }
+                }
 //            Log.d("fetchCurrentRoomInfo", "Changed*****************************${p0.key}")
+            }
         }
 
         override fun onChildAdded(p0: DataSnapshot, p1: String?) {
@@ -283,6 +299,7 @@ class GameActivity : BaseActivity() {
 
             override fun onRestart() {
                 playerListStatus.clear()
+                sendCommand(COMMAND_STAY_KEY)
                 adapter.notifyDataSetChanged()
             }
         }
