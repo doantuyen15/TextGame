@@ -53,7 +53,7 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="@string/player_name"
-                android:textColor="#60E6CD"
+                android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:typeface="sans"

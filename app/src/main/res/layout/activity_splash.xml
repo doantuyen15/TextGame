@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="108dp"
-        android:text="WELCOME"
+        android:text="TEXT GAME"
         android:textColor="#25C6C8"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
