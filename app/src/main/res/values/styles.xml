@@ -12,14 +12,18 @@
         <item name="colorPrimaryDark">#3AABCF</item>
         <item name="colorPrimary">#3AABCF</item>
 
-        <!-- Set this to true if you want Full Screen without status bar -->
         <item name="android:windowFullscreen">true</item>
-
         <item name="android:windowIsFloating">false</item>
-
-        <!-- This is important! Don't forget to set window background -->
         <item name="android:windowBackground">@color/white</item>
     </style>
+
+<!--    <style name="DialogSlideAnim" parent="@android:style/Theme.Dialog">-->
+    <style name="DialogSlideAnim" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
+<!--        <item name="android:windowFullscreen">true</item>-->
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
     <style name="hello">
 
         <item name="android:textColor">#21838C</item>

@@ -19,7 +19,6 @@
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/game" />
 
-
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/progressBarMain"
         android:layout_width="match_parent"
