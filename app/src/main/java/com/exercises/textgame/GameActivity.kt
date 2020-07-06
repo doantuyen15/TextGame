@@ -314,6 +314,11 @@ class GameActivity : BaseActivity() {
         getDbQuiz("quiz").document(round.quizId)
             .get()
             .addOnSuccessListener {
+                val source = if (it.metadata.isFromCache)
+                    "local cache"
+                else
+                    "server"
+                Log.e("test db offline", "Data fetched from $source")
                 val quiz = it.toObject(Quiz::class.java)
                 mapAnswer.add(quiz?.answer
                     ?.replace(".", "")

@@ -2,6 +2,7 @@ package com.exercises.textgame.fragment
 
 import android.animation.Animator
 import android.app.Activity
+import android.app.Notification
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -16,7 +17,7 @@ import androidx.fragment.app.DialogFragment
 import com.exercises.textgame.R
 import kotlinx.android.synthetic.main.layout_loading_dialog.*
 
-class AlertDialogFragment(private val mListener: DetachDialogListener?=null): DialogFragment() {
+class AlertDialogFragment(private val mListener: DetachDialogListener?=null, private val notification: String?=null): DialogFragment() {
     private var firstTry = true
 //    private lateinit var mListener: DetachDialogListener
 
@@ -48,6 +49,9 @@ class AlertDialogFragment(private val mListener: DetachDialogListener?=null): Di
         val height = ViewGroup.LayoutParams.WRAP_CONTENT
         dialog?.window?.setLayout(width, height)
         dialog?.setCancelable(false)
+        if (notification != null){
+            tvDialog.text = notification
+        }
     }
 
     fun setState(isConnected: Boolean) {

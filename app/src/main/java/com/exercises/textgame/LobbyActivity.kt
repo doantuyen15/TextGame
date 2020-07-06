@@ -139,7 +139,7 @@ class LobbyActivity : BaseActivity() {
     @Suppress("IMPLICIT_CAST_TO_ANY")
     private fun startGameActivity(roomKey: String?, roomTitle: String?=null, host: Boolean = false){
         val intent = Intent(this, GameActivity::class.java)
-        val dialog = AlertDialogFragment()
+        val dialog = AlertDialogFragment(notification = getString(R.string.join_room))
         dialog.show(supportFragmentManager, "loading")
 
         roomKey?.let { key ->

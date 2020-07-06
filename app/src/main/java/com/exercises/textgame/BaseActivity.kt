@@ -185,10 +185,12 @@ const val REQUEST_SPEECH_CODE = 3000
 const val CHILD_CURRENTROOMID_KEY = "currentRoomId"
 const val PREVENT_REMOVE_KEY = "preventRemoveKey"
 const val CHILD_LISTROOMS_KEY = "listrooms"
-
+const val FIRECLOUD_DATABASE_INFO = "databaseInfo"
 const val COMMAND_ATTACK_KEY = "attack"
 const val COMMAND_START_KEY = "start"
 const val COMMAND_DISCONNECTED_KEY = "disconnected"
 const val COMMAND_RECONNECTED_KEY = "reconnected"
 const val COMMAND_QUIT_KEY = "quit"
 const val COMMAND_STAY_KEY = "open"
+const val AppConfig = "config"
+const val CURRENT_DATABASE_VERSION = "CURRENT_DATABASE_VERSION"
