@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/colorPrimaryDark"
+        android:backgroundTint="#3AABCF"
         android:elevation="10dp"
         android:text="Create Room"
         android:textColor="#FFFFFF"
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="18dp"
         android:layout_marginBottom="20dp"
-        android:progressBackgroundTint="@color/colorPrimaryDark"
+        android:progressBackgroundTint="#3AABCF"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -43,8 +43,8 @@
         android:inputType="textPersonName"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:textColor="@color/colorPrimaryDark"
-        android:textColorHint="#53EE00A7"
+        android:textColor="#3AABCF"
+        android:textColorHint="#3AABCF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/progressBar"
         app:layout_constraintStart_toEndOf="@id/btCreateGame" />
