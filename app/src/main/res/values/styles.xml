@@ -19,7 +19,7 @@
 
 <!--    <style name="DialogSlideAnim" parent="@android:style/Theme.Dialog">-->
     <style name="DialogSlideAnim" parent="Theme.MaterialComponents.Dialog">
-        <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
+<!--        <item name="android:windowAnimationStyle">@style/DialogAnimation</item>-->
 <!--        <item name="android:windowFullscreen">true</item>-->
         <item name="android:windowBackground">@color/white</item>
     </style>

@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/animationView"
+        android:id="@+id/loadingFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
@@ -30,17 +30,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/progress_bar" />
-
-    <Button
-        android:id="@+id/btnTest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Test Animation"
-        android:textColor="#000000"
-        app:layout_constraintBottom_toTopOf="@id/btnPlay"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/Sign_out"
