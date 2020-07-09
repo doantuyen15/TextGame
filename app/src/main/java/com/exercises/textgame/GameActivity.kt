@@ -48,7 +48,6 @@ class GameActivity : BaseActivity() {
         setContentView(R.layout.activity_game)
         setDialogAlert(dialogListener)
         checkNetworkConnectivity()
-
         val data = intent.extras
         joinedRoomKey = data?.getString(ROOM_INFO_KEY)!!
         uid = data.getString(USER_UID_KEY)!!
@@ -57,7 +56,7 @@ class GameActivity : BaseActivity() {
         fetchCurrentRoomInfo()
 //        getConnectionState(this)
 
-        adapter = GameAdapter(this, playerListStatus)
+        adapter = GameAdapter(this, playerListStatus, playerLongClickListener)
         adapterChatLog = ChatLogAdapter(this, chatLogs)
         rvPlayerList.adapter = adapter
         rvChatLog.adapter = adapterChatLog
@@ -122,7 +121,6 @@ class GameActivity : BaseActivity() {
 
     private fun sendMessage(message: String) {
         var keyLog = ""
-        val chatLog = HashMap<String, Message?>()
         if (message == ".start" && isHost) {
             sendCommand("start")
         }
@@ -144,12 +142,12 @@ class GameActivity : BaseActivity() {
                 Log.e(GameActivity::class.java.simpleName, "Changed*****************************${e.message}")
             }
             val mes = Message(playerList[uid].toString(), message)
-            chatLog[keyLog] = mes
             chatLogs.add(mes)
             edtMessage.text.clear()
             dbGetRefRoom(it)
                 .child(CHILD_MESSAGE_KEY)
-                .updateChildren(chatLog as Map<String, Any>)
+                .child(keyLog)
+                .setValue(mes)
                 .addOnSuccessListener {
                     adapterChatLog.notifyItemInserted(adapterChatLog.itemCount)
                     rvChatLog.scrollToPosition(adapterChatLog.itemCount - 1)
@@ -157,7 +155,7 @@ class GameActivity : BaseActivity() {
         }
     }
 
-    private fun sendCommand(cmd: String) {
+    private fun sendCommand(cmd: String, index: Int?=null) {
         when (cmd){
             COMMAND_ATTACK_KEY -> {
                 val timestamp = (System.currentTimeMillis() - roundStartStamp).toString()
@@ -178,6 +176,7 @@ class GameActivity : BaseActivity() {
                             child(CHILD_HOSTNAME_KEY)
                                 .setValue(newHost)
                             child(CHILD_MESSAGE_KEY)
+                                .push()
                                 .setValue(Message("Bot", "$userName has left\nNew host is $newHost"))
                         }
                     }
@@ -200,6 +199,28 @@ class GameActivity : BaseActivity() {
                 if(isHost) {
                     commandRef.child(joinedRoomKey)
                         .setValue("restart")
+                }
+                playerListStatus.onEach {
+                    it?.resetPlayerStatus()
+                }
+                adapter.notifyDataSetChanged()
+            }
+            COMMAND_KICK_KEY -> {
+                if (index != null) {
+                    val playerName = playerListStatus[index]?.playerName
+                    val playerId = playerList.filterValues { it == playerName }.keys.first()
+                    playerList.remove(playerId)
+                    playerListStatus.removeAt(index)
+                    playerIndex.remove(playerId)
+                    roomRef.apply {
+                        child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY).child(playerId)
+                            .setValue(null)
+                        child(CHILD_LISTROOMS_KEY).child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY)
+                            .child(playerId)
+                            .setValue(null)
+//                        commandRef.child(joinedRoomKey)
+//                            .setValue("$COMMAND_KICK_KEY$playerId")
+                    }
                 }
             }
         }
@@ -234,7 +255,7 @@ class GameActivity : BaseActivity() {
                 updatePlayerStatus(p0.children)
             }
             if (p0.key == CHILD_MESSAGE_KEY) {
-                updateLastMessage(p0.children.last())
+                updateLastMessage(p0.children.drop(keyLogs.count()))
             }
             if (p0.key == CHILD_ROUND_KEY) {
                 isAnswer = false
@@ -246,8 +267,6 @@ class GameActivity : BaseActivity() {
         override fun onChildAdded(p0: DataSnapshot, p1: String?) {
 //            Log.d("fetchCurrentRoomInfo", "Added*****************************${p0.key}")
             if (p0.key == CHILD_HOSTNAME_KEY && p0.value.toString() == userName){
-//                btnStartGame.isEnabled = true
-//                btnStartGame.visibility = View.VISIBLE
                 isHost = true
             }
             if (p0.key == CHILD_ROOMSTATUS_KEY){
@@ -266,7 +285,7 @@ class GameActivity : BaseActivity() {
 //                Log.d("fetchCurrentRoomInfo", "Changed*****************************${p0.key}")
             }
             if(p0.key == CHILD_MESSAGE_KEY){
-                updateLastMessage(p0.children.last())
+                updateLastMessage(p0.children.drop(keyLogs.count()))
             }
             if(p0.key == CHILD_ATTACKER_KEY){
                 if(p0.value.toString() == uid){
@@ -295,9 +314,7 @@ class GameActivity : BaseActivity() {
             }
 
             override fun onRestart() {
-                playerListStatus.clear()
                 sendCommand(COMMAND_STAY_KEY)
-                adapter.notifyDataSetChanged()
             }
         }
         val resultDialog = ResultDialogFragment(playerListStatus, mDialogListener)
@@ -306,7 +323,6 @@ class GameActivity : BaseActivity() {
 
     private fun fetchCurrentRoomInfo() {
         dbGetRefRoom(joinedRoomKey).addChildEventListener(roomEventListener)
-//        adapter.add(RoomHolder(playerList))
     }
 
     private fun getQuiz(round: Round) {
@@ -314,11 +330,6 @@ class GameActivity : BaseActivity() {
         getDbQuiz("quiz").document(round.quizId)
             .get()
             .addOnSuccessListener {
-                val source = if (it.metadata.isFromCache)
-                    "local cache"
-                else
-                    "server"
-                Log.e("test db offline", "Data fetched from $source")
                 val quiz = it.toObject(Quiz::class.java)
                 mapAnswer.add(quiz?.answer
                     ?.replace(".", "")
@@ -360,14 +371,16 @@ class GameActivity : BaseActivity() {
         startCountDown(timeOut, timeStamp)
     }
 
-    private fun updateLastMessage(newMessage: DataSnapshot) {
-        val newKey = newMessage.key
-        if (!keyLogs.contains(newKey)) {
-            keyLogs.add(newKey)
-            val message = newMessage.getValue(Message::class.java)
-            message?.let { chatLogs.add(it) }
-            adapterChatLog.notifyItemInserted(keyLogs.indexOf(newKey))
-            rvChatLog.scrollToPosition(adapterChatLog.itemCount - 1)
+    private fun updateLastMessage(newMessage: List<DataSnapshot>) {
+        newMessage.forEach { newMess ->
+            val newKey = newMess.key
+            if (!keyLogs.contains(newKey)) {
+                keyLogs.add(newKey)
+                val message = newMess.getValue(Message::class.java)
+                message?.let { chatLogs.add(it) }
+                adapterChatLog.notifyItemInserted(keyLogs.indexOf(newKey))
+                rvChatLog.scrollToPosition(adapterChatLog.itemCount - 1)
+            }
         }
     }
 
@@ -382,9 +395,11 @@ class GameActivity : BaseActivity() {
     }
 
     private fun fetchPlayer(newJoinedPlayer: MutableIterable<DataSnapshot>) {
-        playerList.clear()
+        playerIndex.clear()
+        playerListStatus.clear()
         newJoinedPlayer.forEach {
             val id = it.key.toString()
+
             val playerName = it.value.toString()
             playerList[id] = playerName
             playerIndex.add(id)
@@ -430,6 +445,22 @@ class GameActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    private val playerLongClickListener = object: GameAdapter.OnClickPlayerListener {
+        override fun onLongClickPlayer(index: Int) {
+            if(isHost && index != playerIndex.indexOf(uid)){
+                val builder = AlertDialog.Builder(this@GameActivity)
+                    .setMessage("Kick this player?")
+                    .setPositiveButton("YES") { _, _ ->
+                        sendCommand(COMMAND_KICK_KEY, index)
+                    }
+                    .setNegativeButton("NO") { dialog, _ -> dialog?.dismiss() }
+                val dialog = builder.create();
+                dialog.show()
+            }
+        }
+
     }
 
     private val dialogListener = object: AlertDialogFragment.DetachDialogListener {

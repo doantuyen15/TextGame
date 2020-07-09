@@ -63,10 +63,10 @@ class AlertDialogFragment(private val mListener: DetachDialogListener?=null, pri
             lavLoading.addAnimatorUpdateListener {valueAnimator ->
                 val progress = (valueAnimator.animatedValue as Float * 100).toInt()
                 // animation with 841 frame
-                mListener?.onReconnected()
                 if(progress >= 47){
                     lavLoading.cancelAnimation()
                     if (dialog?.isShowing!!) {
+                        mListener?.onReconnected()
                         dialog?.dismiss()
                     }
                 }

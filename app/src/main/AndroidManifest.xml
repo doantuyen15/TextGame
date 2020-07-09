@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-<!--        <activity android:name=".FirebaseHandler" />-->
+        <activity android:name=".ProfileActivity"></activity>
+        <!-- <activity android:name=".FirebaseHandler" /> -->
         <activity android:name=".GameActivity" />
         <activity android:name=".LobbyActivity" />
         <activity android:name=".SplashActivity">
@@ -28,7 +29,6 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".LoginActivity" />
-
     </application>
 
 </manifest>

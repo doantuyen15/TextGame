@@ -2,10 +2,15 @@ package com.exercises.textgame.models
 
 // player status holder
 data class PlayerStatus(val playerName: String?="Player",
-                        val hp: Long?=100L,
-                        val defend: Long?=null,
-                        val attack: Long?=null,
-                        val surrender: Long?=null)
+                        var hp: Long?=100L,
+                        var defend: Long?=null,
+                        var attack: Long?=null,
+                        var surrender: Long?=null)
 {
-    constructor() : this ("",0L,null,null,null)
+    fun resetPlayerStatus(){
+        this.hp = 100L
+        this.defend = 0L
+        this.attack = 0L
+        this.surrender = 0L
+    }
 }

@@ -11,7 +11,7 @@ import com.exercises.textgame.R
 import com.exercises.textgame.models.PlayerStatus
 
 
-class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus?>) : RecyclerView.Adapter<GameAdapter.RoomVH>() {
+class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus?>, private val listener: OnClickPlayerListener) : RecyclerView.Adapter<GameAdapter.RoomVH>() {
     private var isStart: Boolean = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomVH {
         val view = LayoutInflater.from(context).inflate(R.layout.player_item, parent, false)
@@ -31,14 +31,15 @@ class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus
             holder.processBar.visibility = View.VISIBLE
             holder.processBar.progress = (player?.hp)?.toInt() ?: 0
         }
-//        holder.itemView.setOnClickListener {
-//            listener.onClick(position)
-//        }
+        holder.itemView.setOnLongClickListener {
+            listener.onLongClickPlayer(position)
+            true
+        }
     }
 
-//    interface OnClickListener {
-//        fun onClick(index: Int)
-//    }
+    interface OnClickPlayerListener {
+        fun onLongClickPlayer(index: Int)
+    }
 
     fun notifyGameStart() {
         isStart = true
