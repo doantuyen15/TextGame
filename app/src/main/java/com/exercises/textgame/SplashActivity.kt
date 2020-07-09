@@ -10,67 +10,66 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_splash.*
 
 class SplashActivity : BaseActivity() {
-    private val fireStore = Firebase.firestore
+//    private val fireCloud = Firebase.firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        fireStore.firestoreSettings =
-            firestoreSettings {
-                isPersistenceEnabled = true
-            }
-
-        fireStore.firestoreSettings =
-            FirebaseFirestoreSettings.Builder()
-                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-                .build()
+        checkDatabaseVersion()
 
         val bootCheck = checkGooglePlayService()
         if (!bootCheck) {
             showBootCheckDialog()
         } else {
-            checkDatabaseVersion()
+            Log.d("checkDatabase*********", "checked")
             startBootAnimation()
         }
     }
 
     private fun checkDatabaseVersion() {
+        Log.d("checkDatabase*********", "checking")
         val savedCurrentVersion = getSharedPreferences(AppConfig, Context.MODE_PRIVATE)
-        val currentVersion = savedCurrentVersion.getString(CURRENT_DATABASE_VERSION, "0")
+        val currentVersion = savedCurrentVersion.getString(CURRENT_DATABASE_VERSION, "firstRun")
+        if (currentVersion == "firstRun") {
+            Log.d("checkDatabase*********", "current version: ${currentVersion.toString()}")
+            Firebase.firestore.firestoreSettings =
+                firestoreSettings {
+                    isPersistenceEnabled = true
+                    setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED).build()
+                }
+        }
         dbQuiz.collection(FIRECLOUD_DATABASE_INFO).document("version")
-            .get()
+            .get(Source.SERVER)
             .addOnSuccessListener { result ->
                 val version = result.data!!.keys.first().toString()
                 if(currentVersion != version){
                     updateDatabase(version)
+                    Log.d("checkDatabase*********", "UPDATING DB")
                 } else{
-                    fireStore.disableNetwork().addOnCompleteListener {
-
-                    }
+                    Log.d("checkDatabase*********", "DB is up to date")
                 }
             }
     }
 
     private fun updateDatabase(version: String) {
         val savedCurrentVersion = getSharedPreferences(AppConfig, Context.MODE_PRIVATE)
-        dbQuiz.collection(FIRECLOUD_DATABASE_INFO).document("quiz")
-        getDbQuiz("quiz").document()
-            .get()
+        getDbQuiz("quiz")
+            .get(Source.SERVER)
             .addOnSuccessListener {
+                Log.d("checkDatabase*********", it.toString())
                 savedCurrentVersion.edit()
                     .putString(CURRENT_DATABASE_VERSION, version)
                     .apply()
-                fireStore.disableNetwork().addOnCompleteListener {
-
-                }
             }
     }
 

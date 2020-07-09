@@ -6,17 +6,23 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import com.exercises.textgame.fragment.AlertDialogFragment
 import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.Source
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 
 
@@ -97,8 +103,12 @@ open class BaseActivity : AppCompatActivity(){
     }
 
     fun checkGooglePlayService(): Boolean {
-        val status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
-        return status == ConnectionResult.SUCCESS
+        val googleApiAvailability = GoogleApiAvailability.getInstance()
+        val status = googleApiAvailability.isGooglePlayServicesAvailable(this)
+        if (status == ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) {
+            return false
+        }
+        return true
     }
 
     fun dbGetRefUser(ref : String): DatabaseReference {

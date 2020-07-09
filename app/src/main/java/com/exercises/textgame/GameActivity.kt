@@ -19,6 +19,7 @@ import com.exercises.textgame.fragment.AlertDialogFragment
 import com.exercises.textgame.fragment.ResultDialogFragment
 import com.exercises.textgame.models.*
 import com.google.firebase.database.*
+import com.google.firebase.firestore.Source
 import kotlinx.android.synthetic.main.activity_game.*
 import java.lang.Exception
 import java.util.*
@@ -41,7 +42,7 @@ class GameActivity : BaseActivity() {
     private var timeOut = 0L
     private var isHost = false
     private var isAnswer = false
-    private var reconnect = false
+    private var isStart = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,18 +70,13 @@ class GameActivity : BaseActivity() {
         //Send message
         validateMessage()
         btnSendMessage.setOnClickListener {
-                sendMessage(edtMessage.text.toString())
+            sendMessage(edtMessage.text.toString())
+            edtMessage.text.clear()
         }
         //get Speech
         btnMic.setOnClickListener {
             getSpeech(LANGUAGE_EN_KEY)
         }
-        //Start Game
-//        btnStartGame.setOnClickListener {
-//            btnStartGame.isEnabled = false
-//            btnStartGame.visibility = View.GONE
-//            sendCommand("start")
-//        }
     }
 
     private fun getSpeech(languageKey: String) {
@@ -101,7 +97,7 @@ class GameActivity : BaseActivity() {
         if (requestCode == REQUEST_SPEECH_CODE && resultCode == Activity.RESULT_OK && data != null) {
             val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             result?.let {
-                sendMessage(it[0])
+                sendMessage(it.first())
             }
         }
     }
@@ -121,6 +117,18 @@ class GameActivity : BaseActivity() {
 
     private fun sendMessage(message: String) {
         var keyLog = ""
+        keyLog = dbGetRefRoom(joinedRoomKey).push().key!!
+        keyLogs.add(keyLog)
+        val mes = Message(playerList[uid].toString(), message)
+        chatLogs.add(mes)
+        dbGetRefRoom(joinedRoomKey)
+            .child(CHILD_MESSAGE_KEY)
+            .child(keyLog)
+            .setValue(mes)
+
+        adapterChatLog.notifyItemInserted(adapterChatLog.itemCount)
+        rvChatLog.scrollToPosition(adapterChatLog.itemCount - 1)
+
         if (message == ".start" && isHost) {
             sendCommand("start")
         }
@@ -134,25 +142,6 @@ class GameActivity : BaseActivity() {
                 sendCommand("attack")
             }
         }
-        joinedRoomKey.let{
-            try{
-                keyLog = dbGetRefRoom(it).push().key!!
-                keyLogs.add(keyLog)
-            } catch (e : Exception){
-                Log.e(GameActivity::class.java.simpleName, "Changed*****************************${e.message}")
-            }
-            val mes = Message(playerList[uid].toString(), message)
-            chatLogs.add(mes)
-            edtMessage.text.clear()
-            dbGetRefRoom(it)
-                .child(CHILD_MESSAGE_KEY)
-                .child(keyLog)
-                .setValue(mes)
-                .addOnSuccessListener {
-                    adapterChatLog.notifyItemInserted(adapterChatLog.itemCount)
-                    rvChatLog.scrollToPosition(adapterChatLog.itemCount - 1)
-                }
-        }
     }
 
     private fun sendCommand(cmd: String, index: Int?=null) {
@@ -164,6 +153,7 @@ class GameActivity : BaseActivity() {
                     .setValue(uid)
             }
             COMMAND_START_KEY -> {
+                isStart = true
                 commandRef.child(joinedRoomKey)
                     .setValue("start")
             }
@@ -306,6 +296,7 @@ class GameActivity : BaseActivity() {
     }
 
     private fun showResult() {
+        isStart = false
         val mDialogListener = object: ResultDialogFragment.DetachDialogListener {
             override fun onDetachDialog() {
                 sendCommand("quit")
@@ -327,9 +318,15 @@ class GameActivity : BaseActivity() {
 
     private fun getQuiz(round: Round) {
         mapAnswer.clear()
+
         getDbQuiz("quiz").document(round.quizId)
-            .get()
+            .get(Source.CACHE)
             .addOnSuccessListener {
+                val source = if (it.metadata.isFromCache)
+                    "local cache"
+                else
+                    "server"
+                Log.d("getQuiz***********", "Data fetched from $source")
                 val quiz = it.toObject(Quiz::class.java)
                 mapAnswer.add(quiz?.answer
                     ?.replace(".", "")
@@ -344,7 +341,6 @@ class GameActivity : BaseActivity() {
             }
             .addOnFailureListener {
                 Log.d("get quiz", "failed with error: ${it.message}")
-//                retryToConnect()
             }
     }
 
@@ -449,7 +445,7 @@ class GameActivity : BaseActivity() {
 
     private val playerLongClickListener = object: GameAdapter.OnClickPlayerListener {
         override fun onLongClickPlayer(index: Int) {
-            if(isHost && index != playerIndex.indexOf(uid)){
+            if(isHost && index != playerIndex.indexOf(uid) && !isStart){
                 val builder = AlertDialog.Builder(this@GameActivity)
                     .setMessage("Kick this player?")
                     .setPositiveButton("YES") { _, _ ->
