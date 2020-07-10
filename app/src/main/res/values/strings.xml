@@ -15,4 +15,5 @@
     <string name="zero">0</string>
     <string name="join_room">Joining room...</string>
     <string name="select_photo">select photo</string>
+    <string name="profile">Profile</string>
 </resources>

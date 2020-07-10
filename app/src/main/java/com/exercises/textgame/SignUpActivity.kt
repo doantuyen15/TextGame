@@ -1,17 +1,13 @@
 package com.exercises.textgame
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
 import com.exercises.textgame.models.UserInfo
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.database.DataSnapshot
@@ -92,7 +88,7 @@ class SignUpActivity : BaseActivity() {
             .addOnCompleteListener(this, OnCompleteListener<AuthResult>() { task ->
                 if (task.isSuccessful) {
                     //save user info to server
-                    saveUserToFireBase(fullName)
+                    saveUserToFireBase(fullName, email)
                 } else {
                     val getError = task.exception?.message
                     Log.d("sign up", "===== sign up error: $getError")
@@ -101,7 +97,7 @@ class SignUpActivity : BaseActivity() {
             })
     }
 
-    private fun saveUserToFireBase(fullName : String) {
+    private fun saveUserToFireBase(fullName: String, email: String) {
         // ref: /users/uid
         val user = Firebase.auth.currentUser!!
         dbGetRefUser(user.uid).setValue(UserInfo(fullName))
@@ -109,7 +105,10 @@ class SignUpActivity : BaseActivity() {
                 //ref: /users/usernames/username
                 //dbGetRefUser("usernames").child("$fullName").setValue(true)
                 Toast.makeText(this, "Sign Up Successful!", Toast.LENGTH_LONG).show()
-                startActivity(Intent(this,MainActivity::class.java))
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra(USER_UID_KEY, email)
+                intent.putExtra(USER_USERNAME_KEY, fullName)
+                startActivity(intent)
                 finish()
             }
             .addOnFailureListener {
@@ -118,7 +117,7 @@ class SignUpActivity : BaseActivity() {
         //update user's profile
         val profileUpdates = userProfileChangeRequest {
             displayName = fullName
-            //photoUri = Uri.parse("https://example.com/jane-q-user/profile.jpg")
+//            photoUri = Uri.parse("https://example.com/jane-q-user/profile.jpg")
         }
         user.updateProfile(profileUpdates)
             .addOnCompleteListener { task ->

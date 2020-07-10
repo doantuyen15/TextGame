@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.exercises.textgame.R
 import com.exercises.textgame.models.PlayerStatus
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_profile.*
 
 
 class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus?>, private val listener: OnClickPlayerListener) : RecyclerView.Adapter<GameAdapter.RoomVH>() {
@@ -24,6 +27,11 @@ class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus
 
     override fun onBindViewHolder(holder: RoomVH, position: Int) {
         val player = data[position]
+//        Glide.with(context)
+//            .load(FirebaseAuth.getInstance().currentUser?.photoUrl)
+//            .placeholder(R.drawable.selectphoto)
+//            .centerCrop()
+//            .into(btnSelectPhoto)
         holder.tvPlayer.text = player?.playerName
         if(!isStart){
             holder.processBar.visibility = View.GONE

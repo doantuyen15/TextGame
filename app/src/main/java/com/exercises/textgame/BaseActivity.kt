@@ -186,6 +186,7 @@ open class BaseActivity : AppCompatActivity(){
 }
 
 const val USER_UID_KEY = "USER_UID_KEY"
+const val USER_EMAIL_KEY = "USER_EMAIL_KEY"
 const val USER_USERNAME_KEY = "USER_USERNAME_KEY"
 const val ROOM_INFO_KEY = "ROOM_INFO_KEY"
 const val QUIZ_GAME_KEY = "Quiz"

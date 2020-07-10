@@ -34,6 +34,10 @@ class MainActivity : BaseActivity() {
             startGame()
         }
 
+        btnProfile.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
         Sign_out.setOnClickListener {
             signOut()
         }
