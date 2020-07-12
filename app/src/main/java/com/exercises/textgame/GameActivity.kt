@@ -58,7 +58,7 @@ class GameActivity : BaseActivity() {
         fetchCurrentRoomInfo()
 //        getConnectionState(this)
 
-        adapter = GameAdapter(this, playerListStatus, playerLongClickListener)
+        adapter = GameAdapter(this, playerListStatus, playerLongClickListener, playerAvatarList)
         adapterChatLog = ChatLogAdapter(this, chatLogs, playerAvatarList)
         rvPlayerList.adapter = adapter
         rvChatLog.adapter = adapterChatLog
@@ -133,6 +133,9 @@ class GameActivity : BaseActivity() {
         if (message == ".start" && isHost) {
             sendCommand("start")
         }
+        if ( message == ".help") {
+            sendCommand("help")
+        }
         if (!mapAnswer.isNullOrEmpty() && !isAnswer) {
             isAnswer = true
             val ans = message
@@ -152,6 +155,12 @@ class GameActivity : BaseActivity() {
                 commandRef.child(joinedRoomKey)
                     .child(timestamp)
                     .setValue(uid)
+            }
+            COMMAND_HELP_KEY -> {
+                if (!isStart) {
+                    commandRef.child(joinedRoomKey)
+                        .setValue("help")
+                }
             }
             COMMAND_START_KEY -> {
                 isStart = true
@@ -177,8 +186,12 @@ class GameActivity : BaseActivity() {
                     commandRef.child(joinedRoomKey)
                         .setValue("out$uid")
                 } else {
-                    commandRef.child(joinedRoomKey)
-                        .setValue("quit")
+                    apply{
+                        commandRef.child(joinedRoomKey)
+                            .setValue("quit")
+                        dbGetRefRoom(joinedRoomKey).child(CHILD_MESSAGE_KEY)
+                            .setValue(Message("Bot", "$userName has left!"))
+                    }
                 }
             }
             COMMAND_RECONNECTED_KEY -> {
@@ -345,18 +358,24 @@ class GameActivity : BaseActivity() {
                     "server"
                 Log.d("getQuiz***********", "Data fetched from $source")
                 val quiz = it.toObject(Quiz::class.java)
-                mapAnswer.add(quiz?.answer
-                    ?.replace(".", "")
-                    ?.replace(" ", "")
-                    ?.replace(",", "")
-                    ?.replace("'", "")
-                    ?.toLowerCase(Locale.getDefault()))
-                quiz?.answer2?.let{ ans -> mapAnswer.add(ans
+                mapAnswer.add(quiz?.answer.toString()
                     .replace(".", "")
                     .replace(" ", "")
                     .replace(",", "")
                     .replace("'", "")
-                    .toLowerCase(Locale.getDefault())) }
+                    .toLowerCase(Locale.getDefault()))
+                mapAnswer.add(quiz?.answer2.toString()
+                    .replace(".", "")
+                    .replace(" ", "")
+                    .replace(",", "")
+                    .replace("'", "")
+                    .toLowerCase(Locale.getDefault()))
+                mapAnswer.add(quiz?.answer3.toString()
+                    .replace(".", "")
+                    .replace(" ", "")
+                    .replace(",", "")
+                    .replace("'", "")
+                    .toLowerCase(Locale.getDefault()))
                 Log.d("get quiz", "${quiz?.timeOut}")
                 if(quiz != null) showQuiz(round.round, round.syncTimer, quiz)
             }
@@ -412,7 +431,7 @@ class GameActivity : BaseActivity() {
     }
 
     private fun fetchPlayer(fetchPlayer: MutableList<DataSnapshot>) {
-        if (playerIndex.count() > fetchPlayer.count() && !isStart) {
+        if (playerIndex.count() > fetchPlayer.count()) {
             val newFetchId = playerIndex
             fetchPlayer.forEach{
                 newFetchId.remove(it.key)

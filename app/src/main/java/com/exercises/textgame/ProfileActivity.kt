@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.userProfileChangeRequest
@@ -60,6 +61,7 @@ class ProfileActivity : BaseActivity() {
                 .addOnSuccessListener {
                     ref.downloadUrl.addOnSuccessListener {
                         Log.d("uploadImage", it.toString())
+                        Toast.makeText(this, "Avatar updated", Toast.LENGTH_LONG).show()
                         fireBaseAuthInstance.currentUser?.uid?.let { uid ->
                             val profileUpdates = userProfileChangeRequest {
                                 photoUri = it

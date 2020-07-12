@@ -12,11 +12,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.exercises.textgame.R
 import com.exercises.textgame.models.PlayerStatus
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_profile.*
 
 
-class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus?>, private val listener: OnClickPlayerListener) : RecyclerView.Adapter<GameAdapter.RoomVH>() {
+class GameAdapter(
+    private val context: Context,
+    var data: ArrayList<PlayerStatus?>,
+    private val listener: OnClickPlayerListener,
+    private val playerAvatarList: HashMap<String, String?>
+) : RecyclerView.Adapter<GameAdapter.RoomVH>() {
     private var isStart: Boolean = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomVH {
         val view = LayoutInflater.from(context).inflate(R.layout.player_item, parent, false)
@@ -30,7 +33,7 @@ class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus
     override fun onBindViewHolder(holder: RoomVH, position: Int) {
         val player = data[position]
         Glide.with(context)
-            .load(player?.avatarUri)
+            .load(playerAvatarList[player?.playerName])
             .placeholder(R.drawable.googleicon)
             .centerCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
