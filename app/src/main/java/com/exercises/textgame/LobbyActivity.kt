@@ -16,10 +16,6 @@ import kotlinx.android.synthetic.main.activity_lobby.*
 
 
 class LobbyActivity : BaseActivity() {
-
-    companion object{
-        const val TAG = "LOBBY ACTIVITY"
-    }
     private lateinit var adapter : LobbyAdapter
     val roomList: ArrayList<RoomInfo> = ArrayList()
     val roomKeyList = mutableListOf<String>()
@@ -130,14 +126,15 @@ class LobbyActivity : BaseActivity() {
     }
     private val listener = object : LobbyAdapter.OnClickListener {
         override fun onClick(index: Int) {
-            if(roomList[index].roomStatus != "playing") {
+            val status = roomList[index].roomStatus
+            if(status != "playing" && status != "start") {
                 startGameActivity(roomKeyList[index])
             }
         }
     }
 
     @Suppress("IMPLICIT_CAST_TO_ANY")
-    private fun startGameActivity(roomKey: String?, roomTitle: String?=null, host: Boolean = false){
+    private fun startGameActivity(roomKey: String?, roomTitle: String?=null, host: Boolean = false) {
         val intent = Intent(this, GameActivity::class.java)
         val dialog = AlertDialogFragment(notification = getString(R.string.join_room))
         dialog.show(supportFragmentManager, "loading")
@@ -148,11 +145,12 @@ class LobbyActivity : BaseActivity() {
             intent.putExtra(USER_USERNAME_KEY, userName)
 //            val defaultUserStatus = HashMap<String, Any?>()
 //            defaultUserStatus[uid] = PlayerStatus(userName)
-            val user = HashMap<String, String>()
-            user[uid] = userName
-
+            val user = HashMap<String, Any>()
+            val userWithAvatar = HashMap<String, Any>()
+            user[uid] = PlayerInfo(userName, fireBaseAuthInstance.currentUser?.photoUrl.toString())
+            userWithAvatar[uid] = userName
             if (host) { //create new room
-                val createRoomInfo =  RoomInfo(userName, roomTitle, QUIZ_GAME_KEY, user)
+                val createRoomInfo = RoomInfo(userName, roomTitle, QUIZ_GAME_KEY, user)
                 roomRef.apply {
                     child(key)
                         .setValue(createRoomInfo)
@@ -162,19 +160,21 @@ class LobbyActivity : BaseActivity() {
                             finish()
                         }
                     child(CHILD_LISTROOMS_KEY)
-                        .updateChildren(mapOf(key to createRoomInfo))
+                        .updateChildren(mapOf(key to RoomInfo(userName, roomTitle, QUIZ_GAME_KEY, userWithAvatar)))
                 }
             } else {
-                dbGetRefRoom(key).child(CHILD_JOINEDUSER_KEY)
-                    .child(uid)
+                userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(key)
+                roomRef.child(CHILD_LISTROOMS_KEY).child(key).child(CHILD_JOINEDUSER_KEY).child(uid)
                     .setValue(userName)
+                roomRef.child(key).child(CHILD_JOINEDUSER_KEY).child(uid)
+                    .setValue(PlayerInfo(userName, fireBaseAuthInstance.currentUser?.photoUrl.toString()))
                     .addOnSuccessListener {
-                        userRef.child(uid).child(CHILD_CURRENTROOMID_KEY).setValue(key)
                         startActivity(intent)
 //                        dialog.setDismiss()
                         finish()
                     }
             }
+            dbGetRefRoom(key)
         }
     }
 

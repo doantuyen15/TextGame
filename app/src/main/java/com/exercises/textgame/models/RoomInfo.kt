@@ -3,7 +3,7 @@ package com.exercises.textgame.models
 data class RoomInfo(val hostName: String?=null,
                     val roomTitle: String?=null,
                     val gameType: String,
-                    val joinedUser: HashMap<String, String>?=null,
+                    val joinedUser: HashMap<String, Any>?=null,
                     var roomStatus: String?="create"
                     )
 {

@@ -100,6 +100,20 @@ class SignUpActivity : BaseActivity() {
     private fun saveUserToFireBase(fullName: String, email: String) {
         // ref: /users/uid
         val user = Firebase.auth.currentUser!!
+        val profileUpdates = userProfileChangeRequest {
+            displayName = fullName
+//            photoUri = Uri.parse("https://example.com/jane-q-user/profile.jpg")
+        }
+        user.updateProfile(profileUpdates)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    //Log.d(SignUpActivity::class.java.simpleName, "User profile updated.")
+                } else {
+                    val getError = task.exception?.message
+                    Toast.makeText(this, "$getError", Toast.LENGTH_LONG).show()
+                    //delete temp user if error
+                }
+            }
         dbGetRefUser(user.uid).setValue(UserInfo(fullName))
             .addOnSuccessListener {
                 //ref: /users/usernames/username
@@ -115,20 +129,11 @@ class SignUpActivity : BaseActivity() {
                 Toast.makeText(this, "${it.message}", Toast.LENGTH_LONG).show()
             }
         //update user's profile
-        val profileUpdates = userProfileChangeRequest {
-            displayName = fullName
-//            photoUri = Uri.parse("https://example.com/jane-q-user/profile.jpg")
-        }
-        user.updateProfile(profileUpdates)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    //Log.d(SignUpActivity::class.java.simpleName, "User profile updated.")
-                } else {
-                    val getError = task.exception?.message
-                    Toast.makeText(this, "$getError", Toast.LENGTH_LONG).show()
-                    //delete temp user if error
-                }
-            }
+        hideProgressBar()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         hideProgressBar()
     }
 //    companion object {

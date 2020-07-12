@@ -118,7 +118,7 @@ class MainActivity : BaseActivity() {
         gameActivity: Intent,
         lobby: Intent
     ) {
-        roomRef.orderByKey().equalTo(roomKey).addListenerForSingleValueEvent(object: ValueEventListener{
+        roomRef.child(CHILD_LISTROOMS_KEY).orderByKey().equalTo(roomKey).addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
                 Log.d("MainActivity Start Game", "error at $p0")
             }

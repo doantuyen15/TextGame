@@ -32,6 +32,7 @@ class GameActivity : BaseActivity() {
     private val playerListStatus = ArrayList<PlayerStatus?>()
     private var playerIndex = ArrayList<String?>()
     private var playerList = HashMap<String,String>()
+    private var playerAvatarList = HashMap<String, String?>()
     private val chatLogs = ArrayList<Message>()
     private val keyLogs = ArrayList<String?>()
     private var uid: String = ""
@@ -58,7 +59,7 @@ class GameActivity : BaseActivity() {
 //        getConnectionState(this)
 
         adapter = GameAdapter(this, playerListStatus, playerLongClickListener)
-        adapterChatLog = ChatLogAdapter(this, chatLogs)
+        adapterChatLog = ChatLogAdapter(this, chatLogs, playerAvatarList)
         rvPlayerList.adapter = adapter
         rvChatLog.adapter = adapterChatLog
 
@@ -170,10 +171,11 @@ class GameActivity : BaseActivity() {
                                 .setValue(Message("Bot", "$userName has left\nNew host is $newHost"))
                         }
                     }
-                    commandRef.child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY)
+                    roomRef.child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY)
                         .child(uid)
                         .setValue(null)
-
+                    commandRef.child(joinedRoomKey)
+                        .setValue("out$uid")
                 } else {
                     commandRef.child(joinedRoomKey)
                         .setValue("quit")
@@ -196,21 +198,21 @@ class GameActivity : BaseActivity() {
                 adapter.notifyDataSetChanged()
             }
             COMMAND_KICK_KEY -> {
-                if (index != null) {
-                    val playerName = playerListStatus[index]?.playerName
-                    val playerId = playerList.filterValues { it == playerName }.keys.first()
-                    playerList.remove(playerId)
-                    playerListStatus.removeAt(index)
-                    playerIndex.remove(playerId)
+                val playerId = playerIndex.elementAt(index!!)
+                playerList.remove(playerId)
+                playerListStatus.removeAt(index)
+                playerIndex.removeAt(index)
+                if (playerId != null) {
                     roomRef.apply {
                         child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY).child(playerId)
                             .setValue(null)
+
                         child(CHILD_LISTROOMS_KEY).child(joinedRoomKey).child(CHILD_JOINEDUSER_KEY)
                             .child(playerId)
                             .setValue(null)
-//                        commandRef.child(joinedRoomKey)
-//                            .setValue("$COMMAND_KICK_KEY$playerId")
                     }
+                    userRef.child(playerId).child(CHILD_CURRENTROOMID_KEY)
+                        .setValue(null)
                 }
             }
         }
@@ -238,17 +240,27 @@ class GameActivity : BaseActivity() {
                     }
                 }
             }
+            if (p0.key == CHILD_HOSTNAME_KEY && p0.value.toString() == userName){
+                isHost = true
+            }
             if (p0.key == CHILD_JOINEDUSER_KEY) {
-                fetchPlayer(p0.children)
+                fetchPlayer(p0.children.toMutableList())
             }
             if (p0.key == CHILD_PLAYERSTATUS_KEY) {
                 updatePlayerStatus(p0.children)
             }
             if (p0.key == CHILD_MESSAGE_KEY) {
-                updateLastMessage(p0.children.drop(keyLogs.count()))
+                updateLastMessage(p0.children.drop(
+                    if (keyLogs.count() != 0){
+                        keyLogs.count() - 1
+                    } else {
+                        keyLogs.count()
+                    }
+                ))
             }
             if (p0.key == CHILD_ROUND_KEY) {
                 isAnswer = false
+                isStart = true
                 p0.getValue(Round::class.java)?.let { value -> getQuiz(value) }
             }
 //            Log.d("fetchCurrentRoomInfo", "Changed*****************************${p0.key}")
@@ -267,7 +279,7 @@ class GameActivity : BaseActivity() {
 //                        Log.d(GameActivity::class.java.simpleName, "Added*****************************${p0.key}")
             }
             if (p0.key == CHILD_JOINEDUSER_KEY) {
-                fetchPlayer(p0.children)
+                fetchPlayer(p0.children.toMutableList())
             }
             if(p0.key == CHILD_ROUND_KEY){
                 isAnswer = false
@@ -275,7 +287,13 @@ class GameActivity : BaseActivity() {
 //                Log.d("fetchCurrentRoomInfo", "Changed*****************************${p0.key}")
             }
             if(p0.key == CHILD_MESSAGE_KEY){
-                updateLastMessage(p0.children.drop(keyLogs.count()))
+                updateLastMessage(p0.children.drop(
+                    if (keyLogs.count() != 0){
+                        keyLogs.count() - 1
+                    } else {
+                        keyLogs.count()
+                    }
+                ))
             }
             if(p0.key == CHILD_ATTACKER_KEY){
                 if(p0.value.toString() == uid){
@@ -318,7 +336,6 @@ class GameActivity : BaseActivity() {
 
     private fun getQuiz(round: Round) {
         mapAnswer.clear()
-
         getDbQuiz("quiz").document(round.quizId)
             .get(Source.CACHE)
             .addOnSuccessListener {
@@ -331,10 +348,14 @@ class GameActivity : BaseActivity() {
                 mapAnswer.add(quiz?.answer
                     ?.replace(".", "")
                     ?.replace(" ", "")
+                    ?.replace(",", "")
+                    ?.replace("'", "")
                     ?.toLowerCase(Locale.getDefault()))
                 quiz?.answer2?.let{ ans -> mapAnswer.add(ans
                     .replace(".", "")
                     .replace(" ", "")
+                    .replace(",", "")
+                    .replace("'", "")
                     .toLowerCase(Locale.getDefault())) }
                 Log.d("get quiz", "${quiz?.timeOut}")
                 if(quiz != null) showQuiz(round.round, round.syncTimer, quiz)
@@ -390,18 +411,51 @@ class GameActivity : BaseActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    private fun fetchPlayer(newJoinedPlayer: MutableIterable<DataSnapshot>) {
-        playerIndex.clear()
-        playerListStatus.clear()
-        newJoinedPlayer.forEach {
-            val id = it.key.toString()
-
-            val playerName = it.value.toString()
-            playerList[id] = playerName
-            playerIndex.add(id)
-            playerListStatus.add(PlayerStatus(playerName))
+    private fun fetchPlayer(fetchPlayer: MutableList<DataSnapshot>) {
+        if (playerIndex.count() > fetchPlayer.count() && !isStart) {
+            val newFetchId = playerIndex
+            fetchPlayer.forEach{
+                newFetchId.remove(it.key)
+            }
+            val offlineID = newFetchId.last().toString()
+            if (offlineID != uid){
+                playerListStatus.removeIf { player ->
+                    player?.playerName == playerList[offlineID]
+                }
+                playerList.remove(offlineID)
+                playerIndex.remove(offlineID)
+            } else {
+                stopConnect()
+                val builder = AlertDialog.Builder(this@GameActivity)
+                    .setMessage("You have been kicked!")
+                    .setCancelable(false)
+                    .setPositiveButton("Got it") { _, _ ->
+                        finish()
+                    }
+                val dialog = builder.create();
+                dialog.show()
+            }
+        } else if (playerIndex.count() != fetchPlayer.count() && !isStart) {
+            playerIndex.clear()
+            playerList.clear()
+            playerListStatus.clear()
+            fetchPlayer.forEach{
+                val playerInfo = it.getValue(PlayerInfo::class.java)
+                val id = it.key.toString()
+                val playerName = playerInfo?.userName.toString()
+                playerAvatarList[playerName] = playerInfo?.uri
+//                Log.d("fetchPlayer", "playerListStatus playername $playerName")
+                playerList[id] = playerName
+                playerIndex.add(id)
+                playerListStatus.add(PlayerStatus(playerName, playerInfo?.uri))
+            }
         }
         adapter.notifyDataSetChanged()
+    }
+
+    private fun stopConnect() {
+        dbGetRefRoom(joinedRoomKey).removeEventListener(roomEventListener)
+        removeNetworkListener()
     }
 
     private fun updatePlayerStatusBar(isRefresh: Boolean = false){
@@ -484,16 +538,16 @@ class GameActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dbGetRefRoom(joinedRoomKey).removeEventListener(roomEventListener)
-        removeNetworkListener()
+        stopConnect()
     }
 
     override fun onBackPressed() {
         val builder = AlertDialog.Builder(this)
             .setMessage("Are you sure to quit?")
             .setNegativeButton("Yes") { _, _ ->
-                sendCommand("quit")
+                sendCommand(COMMAND_QUIT_KEY)
                 setResult(Activity.RESULT_CANCELED)
+                stopConnect()
                 super.onBackPressed()
                 finish()
             }

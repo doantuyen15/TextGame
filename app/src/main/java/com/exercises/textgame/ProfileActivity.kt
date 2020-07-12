@@ -48,19 +48,26 @@ class ProfileActivity : BaseActivity() {
                 .load(uri)
                 .centerCrop()
                 .into(btnSelectPhoto);
-            val profileUpdates = userProfileChangeRequest {
-                photoUri = uri
-            }
+
             uploadImageToFirebaseStorage(uri)
-            fireBaseAuthInstance.currentUser?.updateProfile(profileUpdates)
         }
     }
 
     private fun uploadImageToFirebaseStorage(uri: Uri?) {
-        if (uri != null){
-            val fileName = UUID.randomUUID().toString()
-            val ref = FirebaseStorage.getInstance().getReference("/images/$fileName")
+        if (uri != null) {
+            val ref = FirebaseStorage.getInstance().getReference("/images/${fireBaseAuthInstance.currentUser?.uid}")
             ref.putFile(uri)
+                .addOnSuccessListener {
+                    ref.downloadUrl.addOnSuccessListener {
+                        Log.d("uploadImage", it.toString())
+                        fireBaseAuthInstance.currentUser?.uid?.let { uid ->
+                            val profileUpdates = userProfileChangeRequest {
+                                photoUri = it
+                            }
+                            fireBaseAuthInstance.currentUser?.updateProfile(profileUpdates)
+                        }
+                    }
+                }
         }
     }
 

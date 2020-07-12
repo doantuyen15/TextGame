@@ -24,6 +24,7 @@ import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
+import java.lang.Exception
 
 
 @SuppressLint("Registered")
@@ -98,7 +99,9 @@ open class BaseActivity : AppCompatActivity(){
         if(firebase){
             connectedRef.removeEventListener(firebaseConnectivityListener)
         } else {
-            cm.unregisterNetworkCallback(networkListener)
+            try{
+                cm.unregisterNetworkCallback(networkListener)
+            } catch (e: Exception) {}
         }
     }
 

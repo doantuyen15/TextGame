@@ -4,16 +4,21 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.exercises.textgame.R
 import com.exercises.textgame.models.Message
-import com.firebase.ui.auth.data.model.User
 
 private const val VIEW_TYPE_USER_MESSAGE = 1
 private const val VIEW_TYPE_BOT_MESSAGE = 2
 
-class ChatLogAdapter(private val context: Context, var data: ArrayList<Message>) : RecyclerView.Adapter<MessageVH>() {
+class ChatLogAdapter(
+    private val context: Context,
+    val data: ArrayList<Message>,
+    val playerAvatarList: HashMap<String, String?>
+) : RecyclerView.Adapter<MessageVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageVH {
         return if(viewType == VIEW_TYPE_USER_MESSAGE) {
@@ -43,11 +48,17 @@ class ChatLogAdapter(private val context: Context, var data: ArrayList<Message>)
     inner class UserMessage (view: View): MessageVH(view){
         private val tvMessage: TextView = itemView.findViewById(R.id.tvMessage)
         private val tvDisplayName: TextView = itemView.findViewById(R.id.tvDisplayName)
+        private val cvAvatar: ImageView = itemView.findViewById(R.id.ivPlayerAvatar)
 
         override fun bind(message: Message) {
             if (!message.message.isNullOrBlank()) {
                 tvMessage.text = message.message
                 tvDisplayName.text = message.displayName
+                Glide.with(context)
+                    .load(playerAvatarList[message.displayName])
+                    .placeholder(R.drawable.googleicon)
+                    .centerCrop()
+                    .into(cvAvatar)
             }
         }
     }

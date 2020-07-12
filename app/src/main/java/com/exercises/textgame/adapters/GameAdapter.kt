@@ -4,10 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.exercises.textgame.R
 import com.exercises.textgame.models.PlayerStatus
 import com.google.firebase.auth.FirebaseAuth
@@ -27,11 +29,12 @@ class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus
 
     override fun onBindViewHolder(holder: RoomVH, position: Int) {
         val player = data[position]
-//        Glide.with(context)
-//            .load(FirebaseAuth.getInstance().currentUser?.photoUrl)
-//            .placeholder(R.drawable.selectphoto)
-//            .centerCrop()
-//            .into(btnSelectPhoto)
+        Glide.with(context)
+            .load(player?.avatarUri)
+            .placeholder(R.drawable.googleicon)
+            .centerCrop()
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(holder.avatar)
         holder.tvPlayer.text = player?.playerName
         if(!isStart){
             holder.processBar.visibility = View.GONE
@@ -62,6 +65,7 @@ class GameAdapter(private val context: Context, var data: ArrayList<PlayerStatus
     class RoomVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvPlayer: TextView = itemView.findViewById(R.id.tvPlayerName)
         val processBar: ProgressBar = itemView.findViewById(R.id.progressBarPlayer)
+        val avatar: ImageView = itemView.findViewById(R.id.cvPlayerAvatar)
     }
 
 

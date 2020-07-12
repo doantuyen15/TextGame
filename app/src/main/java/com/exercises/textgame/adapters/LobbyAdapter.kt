@@ -30,7 +30,9 @@ class LobbyAdapter(private val context: Context, var data: ArrayList<RoomInfo>, 
         holder.title.text = room.roomTitle
         holder.type.text = room.gameType
         holder.itemView.setOnClickListener {
-            listener.onClick(position)
+            if (room.roomStatus != "start") {
+                listener.onClick(position)
+            }
         }
     }
 
